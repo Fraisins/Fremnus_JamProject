@@ -1,5 +1,4 @@
 ﻿using System;
-using Project.Scripts.UI.Data;
 using Project.UI;
 using UnityEngine;
 using VContainer;

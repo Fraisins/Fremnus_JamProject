@@ -49,6 +49,7 @@ MonoBehaviour:
     TypeName: Project.Infrastructure.RootLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
+  settings: {fileID: 11400000, guid: 065b7fadb40ee084ea4c860d0dcb13eb, type: 2}
 --- !u!114 &8942968748491639647
 MonoBehaviour:
   m_ObjectHideFlags: 0

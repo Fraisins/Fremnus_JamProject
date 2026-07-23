@@ -17,7 +17,7 @@ namespace Project.UI
 
         public void StartGame()
         {
-            _sceneService.OpenGame().Forget();
+            _sceneService.OpenGameFromMenu().Forget();
         }
     }
 }

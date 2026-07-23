@@ -1,6 +1,4 @@
 ﻿using Project.Core;
-using Project.Core.Pause;
-using Project.Scripts.UI.Data;
 using UnityEngine;
 using VContainer;
 
@@ -11,21 +9,22 @@ namespace Project.UI
         private ISceneService _sceneService;
         
         [SerializeField] private PauseMenuView pauseMenu;
+        [SerializeField] private GameOverMenuView gameOverMenu;
+        [SerializeField] private LevelFinishedMenu _levelFinishedMenu;
+        
         public PauseMenuView PauseMenu => pauseMenu;
+        public GameOverMenuView GameOverMenu => gameOverMenu;
+        public LevelFinishedMenu LevelFinishedMenu => _levelFinishedMenu;
 
         [Inject]
-        public void Construct(PersistentUIContainer persistentUIContainer,
-            ISceneService sceneService, IPauseService pauseService)
+        public void Construct(ISceneService sceneService)
         {
-            transform.SetParent(persistentUIContainer.Container); // haha...
-            
             _sceneService = sceneService;
-            pauseMenu.Construct(pauseService);
         }
 
         public void ReturnToMainMenu()
         {
-            _sceneService.OpenMenu();
+            _sceneService.OpenMenuFromGame();
         }
     }
 }

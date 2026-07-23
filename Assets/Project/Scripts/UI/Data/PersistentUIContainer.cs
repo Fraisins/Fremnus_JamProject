@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Project.Scripts.UI.Data
+namespace Project.UI
 {
     [Serializable]
     public class PersistentUIContainer // just transform wrapper for VContainer

@@ -10,9 +10,9 @@ namespace Project.UI
     public class CustomButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [Header("Links")]
-        [SerializeField] private Image background;
-        [SerializeField] private TMP_Text label;
-        [SerializeField] private Transform visualChild;
+        [SerializeField] protected Image background;
+        [SerializeField] protected TMP_Text label;
+        [SerializeField] protected Transform visualChild;
 
 #if UNITY_EDITOR
         [Header("Text")] 
@@ -20,14 +20,14 @@ namespace Project.UI
 #endif
         
         [Header("Background colors")]
-        [SerializeField] private Color normalBgColor;
-        [SerializeField] private Color hoverBgColor;
-        [SerializeField] private Color pressedBgColor;
+        [SerializeField] protected Color normalBgColor;
+        [SerializeField] protected Color hoverBgColor;
+        [SerializeField] protected Color pressedBgColor;
         
         [Header("Text colors")]
-        [SerializeField] private Color normalTextColor = Color.white;
-        [SerializeField] private Color hoverTextColor = Color.white;
-        [SerializeField] private Color pressedTextColor = Color.white;
+        [SerializeField] protected Color normalTextColor = Color.white;
+        [SerializeField] protected Color hoverTextColor = Color.white;
+        [SerializeField] protected Color pressedTextColor = Color.white;
         
         [Header("Events")]
         public UnityEvent onPressed;
@@ -37,6 +37,8 @@ namespace Project.UI
 
         public bool IsHovering { get; private set; } = false;
         public bool IsPressed { get; private set; } = false;
+
+        protected bool isActive = true;
 
         // public
         public Transform VisualChild => visualChild;
@@ -55,15 +57,23 @@ namespace Project.UI
         
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
+            if (!isActive)
+                return;
+            
             IsHovering = true;
             if (!IsPressed)
+            {
                 SetColors(hoverBgColor, hoverTextColor);
+            }
             
             onHover?.Invoke();
         }
 
         public virtual void OnPointerExit(PointerEventData eventData)
         {
+            if (!isActive)
+                return;
+            
             IsHovering = false;
             if (!IsPressed)
                 SetColors(normalBgColor, normalTextColor);
@@ -73,8 +83,11 @@ namespace Project.UI
 
         public virtual void OnPointerDown(PointerEventData eventData)
         {
+            if (!isActive)
+                return;
+            
             IsPressed = true;
-            SetColors(hoverBgColor, hoverTextColor);
+            SetColors(pressedBgColor, pressedTextColor);
             
             if (IsHovering)
                 onPressed?.Invoke();
@@ -82,7 +95,8 @@ namespace Project.UI
 
         public virtual void OnPointerUp(PointerEventData eventData)
         {
-            Debug.Log("OnPointerUp");
+            if (!isActive)
+                return;
             
             IsPressed = false;
             if (IsHovering)
@@ -99,11 +113,11 @@ namespace Project.UI
         {
             if (background != null)
                 background.color = bgColor;
-            if (this.label != null)
-                this.label.color = labelColor;
+            if (label != null)
+                label.color = labelColor;
         }
 
-        private void ResetState()
+        protected void ResetState()
         {
             IsPressed = false;
             IsHovering = false;

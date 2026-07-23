@@ -4,6 +4,7 @@ using VContainer.Unity;
 
 using Project.Core;
 using Project.Core.Events;
+using Project.Core.Game;
 using Project.Core.Pause;
 using Project.Data;
 using Project.Game;
@@ -39,6 +40,9 @@ namespace Project.Infrastructure
             
             // REGISTER INPUT
             new InputLifetimeScope().Install(builder);
+            
+            // LEVEL CHOICE HOLDER
+            builder.Register<GameLevelChoiceHolder>(Lifetime.Singleton);
         }
     }
 }

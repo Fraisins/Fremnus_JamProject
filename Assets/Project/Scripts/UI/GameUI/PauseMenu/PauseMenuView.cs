@@ -7,7 +7,7 @@ namespace Project.UI
     {
         private IPauseService _pauseService;
         
-        public void Construct(IPauseService pauseService)
+        public void Init(IPauseService pauseService)
         {
             _pauseService = pauseService;
         }
