@@ -75,7 +75,6 @@ namespace Project.Game.Numbers
             
             _currentModificator = modificator;
             OnModificatorSelected?.Invoke(modificator);
-            Debug.Log($"[ModMachineService] Selected modificator: {modificator.Value}");
         }
 
         public void UnselectModificator()

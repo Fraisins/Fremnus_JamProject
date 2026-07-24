@@ -6,12 +6,15 @@ using Project.Core.Events;
 using Project.Core.Game;
 using Project.Core.Numbers;
 using Project.Core.Robot;
+using Project.Core.SaveSystem;
 using UnityEngine;
 
 namespace Project.Game
 {
     public class GameService : IGameService, IDisposable
     {
+        private bool _isGameFinished = false;
+        
         private readonly GameLevelChoiceHolder _levelChoiceHolder;
         private readonly GameSettingsSO _gameSettings;
         
@@ -20,16 +23,14 @@ namespace Project.Game
         private readonly IModMachineService _modMachineService;
         private readonly IRobotService _robotService;
         private GameLevelSettingsSO _currentLevelSettings;
-        private ISceneService _sceneService;
+        private ISaveService _saveService;
 
         private CancellationTokenSource _gameCts;
         
-        private GameLevelSettingsSO CurrentLevelSettings => 
-            GetLevelSettings(_levelChoiceHolder.currentLevelName);
-        
         public GameService(
             IEventBus eventBus, GameLevelChoiceHolder levelChoiceHolder, IHpNumbersService hpNumbersService, IModMachineService modMachineService,
-            IRobotService robotService, GameSettingsSO gameSettings, ISceneService sceneService)
+            IRobotService robotService, GameSettingsSO gameSettings, ISceneService sceneService, 
+            ISaveService saveService)
         {
             _eventBus = eventBus;
             _levelChoiceHolder = levelChoiceHolder;
@@ -37,11 +38,15 @@ namespace Project.Game
             _modMachineService = modMachineService;
             _robotService = robotService;
             _gameSettings = gameSettings;
-            _sceneService = sceneService;
+            _saveService = saveService;
+
+            _robotService.OnRobotsOrderFinished += HandleRobotsOrderFinished;
+            _eventBus.Subscribe<GameOverEvent>(HandleGameOver);
         }
 
         public void InitScene()
         {;
+            _isGameFinished = false;
             _currentLevelSettings = CurrentLevelSettings;
             SetLevelSettings(_currentLevelSettings);
             
@@ -65,7 +70,10 @@ namespace Project.Game
         }
 
         #region Level
-
+        
+        private GameLevelSettingsSO CurrentLevelSettings => 
+            GetLevelSettings(_levelChoiceHolder.currentLevelName);
+        
         private GameLevelSettingsSO GetLevelSettings(string levelName)
         {
             if (!_gameSettings.LevelSettingsDict.TryGetValue(levelName, out GameLevelSettingsSO levelSettings))
@@ -105,9 +113,40 @@ namespace Project.Game
             InitScene();
         }
 
+        #region Handlers
+
+        private void HandleGameOver(GameOverEvent evt)
+        {
+            FinishScene();
+            _isGameFinished = true;
+        }
+
+        private void HandleRobotsOrderFinished(RobotsFinishedResult result)
+        {
+            if (_isGameFinished) // CHECKS IF GAME OVER HAPPENED AT THE LAST LINE!
+                return;
+            
+            _isGameFinished = true;
+
+            GameLevelFinishedEvent finEvt = new(
+                _levelChoiceHolder.currentLevelName,
+                result.successAmount,
+                result.fullAmount);
+            
+            _saveService.SaveFinishedLevel(_levelChoiceHolder.currentLevelName, finEvt);
+            _eventBus.Publish(finEvt);
+        }
+
+        #endregion
+
         public void Dispose()
         {
+            _gameCts?.Cancel();
             _gameCts?.Dispose();
+            _gameCts = null;
+            
+            _robotService.OnRobotsOrderFinished -= HandleRobotsOrderFinished;
+            _eventBus.Unsubscribe<GameOverEvent>(HandleGameOver);
         }
     }
 }

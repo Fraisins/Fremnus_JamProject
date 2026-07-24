@@ -17,5 +17,7 @@ MonoBehaviour:
     <MinAmount>k__BackingField: 2
     <MaxAmount>k__BackingField: 3
     <MinPositive>k__BackingField: 1
+    <MaxPositive>k__BackingField: 2
     <MinNegative>k__BackingField: 1
-    <RobotAmount>k__BackingField: 3
+    <MaxNegative>k__BackingField: 1
+    <RobotAmount>k__BackingField: 5

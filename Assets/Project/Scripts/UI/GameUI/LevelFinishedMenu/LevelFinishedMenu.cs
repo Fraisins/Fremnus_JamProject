@@ -1,51 +1,52 @@
-﻿using Project.Core.Events;
+﻿using System;
+using PrimeTween;
 using Project.Core.Game;
-using Project.Game;
 using UnityEngine;
 
 namespace Project.UI
 {
-    public class LevelFinishedMenu : MonoBehaviour
+    public class LevelFinishedMenu : GameUIMenu
     {
-        private IEventBus _eventBus;
         private IGameService _gameService;
+        public event Action OnHideRequested;
         
-        [SerializeField] private Transform visualTransform;
         [SerializeField] private CustomButton nextLevelButton;
 
-        public void Init(IEventBus eventBus, IGameService gameService)
+        private void OnEnable()
         {
-            _eventBus = eventBus;
-            _gameService = gameService;
-            
-            _eventBus.Subscribe<GameLevelFinishedEvent>(HandleGameLevelFinished);
-            
             if (nextLevelButton == null)
+            {
+                Debug.LogError($"[LevelFinishedMenu]: {nameof(nextLevelButton)} is null");
                 return;
-                
+            }
             nextLevelButton.onPressed.AddListener(TriggerOpenNextLevel);
-            visualTransform.gameObject.SetActive(false);
         }
 
-        private void HandleGameLevelFinished(GameLevelFinishedEvent obj)
+        private void OnDisable()
         {
-            if (visualTransform == null)
+            if (nextLevelButton == null)
+            {
+                Debug.LogError($"[LevelFinishedMenu]: {nameof(nextLevelButton)} is null");
                 return;
-            
-            visualTransform.gameObject.SetActive(true);
+            }
+            nextLevelButton.onPressed.RemoveListener(TriggerOpenNextLevel);
+        }
+
+        public void Init(IGameService gameService)
+        {
+            _gameService = gameService;
+        }
+
+        public override Tween PlayAppear()
+        {
             nextLevelButton.gameObject.SetActive(_gameService.HasNextLevel());
+            return base.PlayAppear();
         }
 
         private void TriggerOpenNextLevel()
         {
             _gameService.ToNextLevel();
-            visualTransform.gameObject.SetActive(false);
-        }
-
-        private void OnDestroy()
-        {
-            if (nextLevelButton != null)
-                nextLevelButton.onPressed.RemoveListener(TriggerOpenNextLevel);
+            OnHideRequested?.Invoke();
         }
     }
 }

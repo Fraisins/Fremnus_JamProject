@@ -1,4 +1,5 @@
-﻿using Project.Core;
+﻿using PrimeTween;
+using Project.Core;
 using UnityEngine;
 using VContainer;
 
@@ -10,11 +11,11 @@ namespace Project.UI
         
         [SerializeField] private PauseMenuView pauseMenu;
         [SerializeField] private GameOverMenuView gameOverMenu;
-        [SerializeField] private LevelFinishedMenu _levelFinishedMenu;
+        [SerializeField] private LevelFinishedMenu levelFinishedMenu;
         
         public PauseMenuView PauseMenu => pauseMenu;
         public GameOverMenuView GameOverMenu => gameOverMenu;
-        public LevelFinishedMenu LevelFinishedMenu => _levelFinishedMenu;
+        public LevelFinishedMenu LevelFinishedMenu => levelFinishedMenu;
 
         [Inject]
         public void Construct(ISceneService sceneService)

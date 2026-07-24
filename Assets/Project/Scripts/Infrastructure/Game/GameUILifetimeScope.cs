@@ -14,7 +14,6 @@ namespace Project.Infrastructure
         {
             builder.RegisterComponentInNewPrefab(gameUIPrefab, Lifetime.Scoped);
             builder.RegisterEntryPoint<GameUIHandler>(Lifetime.Scoped);
-            builder.RegisterEntryPoint<PauseMenuHandler>(Lifetime.Scoped);
         }
     }
 }

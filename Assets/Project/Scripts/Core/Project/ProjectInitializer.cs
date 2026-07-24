@@ -17,8 +17,8 @@ namespace Project.Game
         
         public async UniTask StartAsync(CancellationToken cancellation = new())
         {
-            await _sceneService.OpenGameFromMenu();
-            //await _sceneService.OpenMenuFromGame();
+            //await _sceneService.OpenGameFromMenu();
+            await _sceneService.OpenMenuFromGame();
         }
     }
 }

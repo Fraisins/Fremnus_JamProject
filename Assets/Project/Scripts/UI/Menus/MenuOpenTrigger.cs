@@ -19,7 +19,7 @@ namespace Project.UI
             Button.onPressed.AddListener(Trigger);
         }
         
-        private void Trigger() => OnTrigger?.Invoke(submenuToOpen);
+        public void Trigger() => OnTrigger?.Invoke(submenuToOpen);
 
         private void OnDestroy()
         {

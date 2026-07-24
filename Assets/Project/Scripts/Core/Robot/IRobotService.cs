@@ -12,6 +12,9 @@ namespace Project.Core.Robot
         RobotOrder Order { get; }
 
         public event System.Action OnInitialized;
+        public event System.Action<RobotRequest> OnRequestStarted;
+        public event System.Action<RobotRequestCheckResult> OnRequestFinished;
+        public event System.Action<RobotsFinishedResult> OnRobotsOrderFinished;
         
         void SetConveyor(RobotConveyor robotConveyor);
         void SetLevelSettings(GameLevelSettingsSO settings);

@@ -57,13 +57,13 @@ namespace Project.Game.Robot
                 else
                     takePositive = canTakePositive;
 
-                if (takePositive)
+                if (takePositive && positiveNumbers.Count < _settings.MaxPositive)
                 {
                     int index = Random.Range(0, notPresentValues.Count);
                     positiveNumbers.Add(notPresentValues[index]);
                     notPresentValues.RemoveAt(index);
                 }
-                else
+                else if (presentValues.Count != 0 && negativeNumbers.Count < _settings.MaxNegative)
                 {
                     int index = Random.Range(0, presentValues.Count);
                     negativeNumbers.Add(presentValues[index]);
@@ -74,11 +74,17 @@ namespace Project.Game.Robot
             request.SetValues(positiveNumbers, negativeNumbers);
         }
 
-        private List<int> GetPresentValues()
+        private List<int> GetPresentValues(bool ignoreNotActive = true)
         {
             List<int> values = new();
             foreach (HpNumber hpNumber in _hpNumbersService.Numbers)
             {
+                if (ignoreNotActive && hpNumber.State != HpNumberState.Active)
+                    continue;
+                
+                if (values.Contains(hpNumber.CurrentValue)) // no repetitions
+                    continue;
+                
                 values.Add(hpNumber.CurrentValue);
             }
             return values;

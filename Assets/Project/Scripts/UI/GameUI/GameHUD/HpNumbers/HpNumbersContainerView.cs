@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Project.Core.Numbers;
+using Project.Core.Robot;
 using UnityEngine;
 using VContainer;
 
@@ -9,16 +10,20 @@ namespace Project.UI
     {
         private IHpNumbersService _hpNumbersService;
         private IModMachineService _modMachineService;
+        private IRobotService _robotService;
 
         [SerializeField] private List<HpNumberView> hpNumberViews = new();
         
         [Inject]
-        public void Construct(IHpNumbersService hpNumbersService, IModMachineService modMachineService)
+        public void Construct(IHpNumbersService hpNumbersService, IModMachineService modMachineService,
+            IRobotService robotService)
         {
             _hpNumbersService = hpNumbersService ?? 
                 throw new System.ArgumentNullException(nameof(hpNumbersService));
             _modMachineService = modMachineService ??
                 throw new System.ArgumentNullException(nameof(modMachineService));
+            _robotService = robotService ??
+                throw new System.ArgumentNullException(nameof(robotService));
             
             _hpNumbersService.OnHpNumbersCreated += HandleHpNumbersCreated;
         }
@@ -39,7 +44,7 @@ namespace Project.UI
                 {
                     hpNumberViews[i].gameObject.SetActive(true);
                     hpNumberViews[i].OnHpNumberViewSelected += HandleOnHpNumberViewSelected;
-                    hpNumberViews[i].Init(numbers[i]);
+                    hpNumberViews[i].Init(numbers[i], _robotService);
                 }
                 else
                 {

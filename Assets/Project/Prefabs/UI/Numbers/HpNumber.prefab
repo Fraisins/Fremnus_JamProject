@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.09140263, g: 0.24528301, b: 0.12540933, a: 1}
+  m_Color: {r: 0.17021184, g: 0.23584908, b: 0.19088303, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -138,9 +138,9 @@ MonoBehaviour:
   background: {fileID: 2841073167815887976}
   label: {fileID: 2400380503380241130}
   visualChild: {fileID: 5445613299837725990}
-  text: 3
-  normalBgColor: {r: 0.09140263, g: 0.24528301, b: 0.12540933, a: 1}
-  hoverBgColor: {r: 0.122641504, g: 0.49056602, b: 0.20113207, a: 1}
+  text: 0
+  normalBgColor: {r: 0.17021184, g: 0.23584908, b: 0.19088303, a: 1}
+  hoverBgColor: {r: 0.18062478, g: 0.38679248, b: 0.22449024, a: 1}
   pressedBgColor: {r: 0.18222678, g: 0.6132076, b: 0.29416987, a: 1}
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
@@ -162,6 +162,12 @@ MonoBehaviour:
   damagedBgColor: {r: 0.09433961, g: 0.056514766, b: 0.05994444, a: 1}
   damagedRectImageTransform: {fileID: 282111594943770720}
   animationDuration: 0.25
+  damageNormalBgColor: {r: 0.5377358, g: 0.13443395, b: 0.14202036, a: 1}
+  damageHoverBgColor: {r: 0.7075472, g: 0.24363652, b: 0.24363652, a: 1}
+  damagePressedBgColor: {r: 0.8018868, g: 0.26855645, b: 0.26855645, a: 1}
+  successNormalBgColor: {r: 0.22739409, g: 0.6603774, b: 0.33122596, a: 1}
+  successHoverBgColor: {r: 0.40610537, g: 0.735849, b: 0.47366703, a: 1}
+  successPressedBgColor: {r: 0.47592562, g: 0.8773585, b: 0.58576393, a: 1}
 --- !u!1 &1742168324981540692
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,8 +202,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 2, y: -2}
+  m_SizeDelta: {x: -4, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7173483912726245982
 CanvasRenderer:
@@ -227,10 +233,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3
+  m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 096972e7279bd9443bf5292097e8b487, type: 2}
+  m_sharedMaterial: {fileID: -5753842008208097475, guid: 096972e7279bd9443bf5292097e8b487, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

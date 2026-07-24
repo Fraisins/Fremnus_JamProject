@@ -3,6 +3,7 @@
     public enum SubmenuType
     {
         None,
-        Sound
+        Sound,
+        LevelSelect,
     }
 }

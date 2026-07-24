@@ -9,6 +9,13 @@ namespace Project.UI
 {
     public class CustomButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
+        public enum State
+        {
+            None,
+            Hover,
+            Pressed,
+        }
+        
         [Header("Links")]
         [SerializeField] protected Image background;
         [SerializeField] protected TMP_Text label;
@@ -39,6 +46,7 @@ namespace Project.UI
         public bool IsPressed { get; private set; } = false;
 
         protected bool isActive = true;
+        protected bool canSetVisuals = true;
 
         // public
         public Transform VisualChild => visualChild;
@@ -50,7 +58,7 @@ namespace Project.UI
 
         private void Start()
         {
-            SetColors(normalBgColor, normalTextColor);
+            SetColors(State.None);
         }
 
         #region HandlePointer
@@ -62,9 +70,7 @@ namespace Project.UI
             
             IsHovering = true;
             if (!IsPressed)
-            {
-                SetColors(hoverBgColor, hoverTextColor);
-            }
+                SetColors(State.Hover);
             
             onHover?.Invoke();
         }
@@ -76,7 +82,7 @@ namespace Project.UI
             
             IsHovering = false;
             if (!IsPressed)
-                SetColors(normalBgColor, normalTextColor);
+                SetColors(State.None);
             
             onHoverEnd?.Invoke();
         }
@@ -87,7 +93,7 @@ namespace Project.UI
                 return;
             
             IsPressed = true;
-            SetColors(pressedBgColor, pressedTextColor);
+            SetColors(State.Pressed);
             
             if (IsHovering)
                 onPressed?.Invoke();
@@ -100,17 +106,36 @@ namespace Project.UI
             
             IsPressed = false;
             if (IsHovering)
-                SetColors(hoverBgColor, hoverTextColor);
+                SetColors(State.Hover);
             else
-                SetColors(normalBgColor, normalTextColor);
+                SetColors(State.None);
             
             onReleased?.Invoke();
         }
 
         #endregion
 
-        private void SetColors(Color bgColor, Color labelColor)
+        protected virtual void SetColors(State state)
         {
+            if (!canSetVisuals)
+                return;
+
+            Color bgColor = state switch
+            {
+                State.None => normalBgColor,
+                State.Hover => hoverBgColor,
+                State.Pressed => pressedBgColor,
+                _ => normalBgColor
+            };
+            
+            Color labelColor = state switch
+            {
+                State.None => normalTextColor,
+                State.Hover => hoverTextColor,
+                State.Pressed => pressedTextColor,
+                _ => normalTextColor
+            };
+            
             if (background != null)
                 background.color = bgColor;
             if (label != null)
@@ -121,13 +146,23 @@ namespace Project.UI
         {
             IsPressed = false;
             IsHovering = false;
-            SetColors(normalBgColor, normalTextColor);
+            SetColors(State.None);
+        }
+
+        protected void SetVisualsHereAndHow()
+        {
+            if (IsPressed)
+                SetColors(State.Pressed);
+            else if (IsHovering)
+                SetColors(State.Hover);
+            else
+                SetColors(State.None);
         }
         
         #if UNITY_EDITOR
         private void OnValidate()
         {
-            SetColors(normalBgColor, normalTextColor);
+            SetColors(State.None);
             
             if (label != null)
                 label.text = text;

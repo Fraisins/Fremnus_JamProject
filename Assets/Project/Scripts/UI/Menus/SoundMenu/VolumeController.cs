@@ -5,7 +5,7 @@ using VContainer;
 
 namespace Project.UI.SoundMenu
 {
-    public class VolumeController : MonoBehaviour
+    public class VolumeController : Submenu
     { 
         [SerializeField] private Slider musicVolumeSlider;
         [SerializeField] private Slider sfxVolumeSlider;

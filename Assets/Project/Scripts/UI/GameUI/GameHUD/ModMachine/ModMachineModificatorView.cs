@@ -1,4 +1,5 @@
 ﻿using System;
+using PrimeTween;
 using Project.Core.Numbers;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,15 +8,26 @@ namespace Project.UI
 {
     public class ModMachineModificatorView : CustomButton
     {
-        private ModMachineModificator _modificator;
-        public event Action<ModMachineModificator> OnSelected;
+        public ModMachineModificator Modificator { get; private set; }
+        public event Action<ModMachineModificatorView> OnSelected;
+        
+        private bool _isSelected;
+        private Tween _selectedAnimation;
+        private Vector3 _originalLabelScale;
+        [SerializeField] private float selectedScaleMultiplier = 0.95f;
+        [SerializeField] private float selectedAnimationDuration = 0.1f;
 
         public void Init(ModMachineModificator modificator)
         {
-            _modificator = modificator ?? throw new ArgumentNullException(nameof(modificator));
-            _modificator.OnModValueChanged += HandleModValueChanged;
+            Modificator = modificator ?? throw new ArgumentNullException(nameof(modificator));
+            Modificator.OnModValueChanged += HandleModValueChanged;
             
-            HandleModValueChanged(_modificator.Value);
+            HandleModValueChanged(Modificator.Value);
+        }
+
+        private void Awake()
+        {
+            _originalLabelScale = label.transform.localScale;
         }
 
         private void HandleModValueChanged(int value)
@@ -25,22 +37,75 @@ namespace Project.UI
             
             label.text = ModHelper.ValueToString(value);
         }
+        
+        public void Clear()
+        {
+            if (Modificator != null)
+                Modificator.OnModValueChanged -= HandleModValueChanged;
+        }
+
+        #region Select
 
         public override void OnPointerDown(PointerEventData eventData)
         {
+            if (_isSelected)
+                return;
+            
+            _isSelected = true;
             base.OnPointerDown(eventData);
-            OnSelected?.Invoke(_modificator);
+            
+            canSetVisuals = false; // so it stay selected
+            OnSelected?.Invoke(this);
+            PlaySelectedAnimation();
         }
 
-        public void Clear()
+        public void Unselect()
         {
-            if (_modificator != null)
-                _modificator.OnModValueChanged -= HandleModValueChanged;
+            if (!_isSelected)
+                return;
+
+            _isSelected = false;
+            canSetVisuals = true;
+            SetVisualsHereAndHow();
+            PlayUnselectedAnimation();
         }
+
+        #endregion
+
+        #region Aniamtion
+
+        private void PlaySelectedAnimation()
+        {
+            if (_selectedAnimation.isAlive)
+                _selectedAnimation.Stop();
+
+            _selectedAnimation = Tween.Scale(
+                label.transform, 
+                label.transform.localScale * selectedScaleMultiplier,
+                selectedAnimationDuration,
+                ease: Ease.InOutQuad);
+        }
+
+        private void PlayUnselectedAnimation()
+        {
+            if (_selectedAnimation.isAlive)
+                _selectedAnimation.Stop();
+            
+            _selectedAnimation = Tween.Scale(
+                label.transform, 
+                _originalLabelScale,
+                selectedAnimationDuration,
+                ease: Ease.InOutQuad);
+        }
+
+        #endregion
 
         public void OnDestroy()
         {
             Clear();
+            
+            if (_selectedAnimation.isAlive)
+                _selectedAnimation.Stop();
         }
     }
 }

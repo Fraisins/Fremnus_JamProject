@@ -18,6 +18,7 @@ namespace Project.UI
                 throw new System.ArgumentNullException(nameof(modMachineService));
             
             _modMachineService.OnModificatorsCreated += HandleModificatorsCreated;
+            _modMachineService.OnModificatorUnselected += HandleModificatorUnselected;
         }
 
         private void HandleModificatorsCreated(IReadOnlyList<ModMachineModificator> mods)
@@ -52,9 +53,30 @@ namespace Project.UI
 
         #region Selection
         
-        private void HandleModificatorSelected(ModMachineModificator mod)
+        private void HandleModificatorSelected(ModMachineModificatorView view)
         {
-            _modMachineService.SelectModificator(mod);
+            if (view == null || view.Modificator == null)
+            {
+                Debug.LogError($"{view?.Modificator} is null");
+                return;
+            }
+            
+            _modMachineService.SelectModificator(view.Modificator);
+
+            foreach (ModMachineModificatorView modView in modificatorViews)
+            {
+                if (view == modView)
+                    continue;
+                modView.Unselect();
+            }
+        }
+
+        private void HandleModificatorUnselected()
+        {
+            foreach (ModMachineModificatorView view in modificatorViews)
+            {
+                view.Unselect();
+            }
         }
         
         #endregion

@@ -1,7 +1,7 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using PrimeTween;
 using Project.Core.Numbers;
+using Project.Core.Robot;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,6 +11,7 @@ namespace Project.UI
     public class HpNumberView : CustomButton
     {
         private HpNumber _hpNumber;
+        private IRobotService _robotService;
         
         [SerializeField] private ProvidedModificatorView providedModificator;
         [SerializeField] private ModAttachedView modAttachedView;
@@ -19,13 +20,25 @@ namespace Project.UI
         [SerializeField] private RectTransform damagedRectImageTransform;
         [SerializeField] private float animationDuration = 0.25f;
 
+        [Header("Damage prediction colors")] 
+        [SerializeField] private Color damageNormalBgColor = Color.red;
+        [SerializeField] private Color damageHoverBgColor = Color.red;
+        [SerializeField] private Color damagePressedBgColor = Color.red;
+        
+        [Header("Success prediction colors")] 
+        [SerializeField] private Color successNormalBgColor = Color.green;
+        [SerializeField] private Color successHoverBgColor = Color.green;
+        [SerializeField] private Color successPressedBgColor = Color.green;
+        
+        private HpNumberChecker.Prediction _currentPrediction;
+        
         private Image _damagedImageFill;
         private float _targetRectImageTransformHeight;
         private Tween _bgColorChange;
         
         public event System.Action<HpNumber> OnHpNumberViewSelected;
         
-        public void Init(HpNumber number)
+        public void Init(HpNumber number, IRobotService robotService)
         {
             if (number == null)
             {
@@ -58,10 +71,18 @@ namespace Project.UI
             HandleState(_hpNumber.State);
             HandleProvidedModificator(_hpNumber.ProvidedModificator);
             HandleModMachineModificator(_hpNumber.ModMachineModificator?.Value ?? 0);
+            
+            // robot service
+            _robotService = robotService ??
+                throw new System.ArgumentNullException(nameof(robotService));
+            _robotService.Request.OnRequestChanged += HandleRequestChanged;
         }
 
         public void SetUnactive()
         {
+            _currentPrediction = HpNumberChecker.Prediction.None;
+            HandleVisualFromPrediction(_currentPrediction);
+            
             if (providedModificator != null)
                 providedModificator.gameObject.SetActive(false);
             
@@ -74,7 +95,12 @@ namespace Project.UI
             _hpNumber.OnStateChanged -= HandleState;
             _hpNumber.OnProvidedModificatorValueChanged -= HandleProvidedModificator;
             _hpNumber.OnModMachineModificatorValueChanged -= HandleModMachineModificator;
+            
+            if (_robotService != null)
+                _robotService.Request.OnRequestChanged += HandleRequestChanged;
         }
+
+        #region HpNumber
 
         private void HandleHpNumber(int value)
         {
@@ -85,6 +111,7 @@ namespace Project.UI
             }
             
             label.text = value.ToString();
+            HandleVisualFromPrediction(GetPredictionForRequest());
         }
         
         private void HandleState(HpNumberState state)
@@ -118,11 +145,14 @@ namespace Project.UI
             }
             modAttachedView.SetValue(value);
         }
+        
+        #endregion
 
         #region Damaged
         
         private async UniTaskVoid DamagedFillRoutine()
         {
+            canSetVisuals = false;
             DamagedRectAlphaChange(true, false);
             AnimateBackgroundColor(damagedBgColor);
             HandleHpNumber(_hpNumber.CurrentValue); // #
@@ -142,6 +172,7 @@ namespace Project.UI
             }
 
             isActive = true;
+            canSetVisuals = true;
             Vector2 finalAnchor = damagedRectImageTransform.anchorMax;
             finalAnchor.y = _targetRectImageTransformHeight;
             damagedRectImageTransform.anchorMax = finalAnchor;
@@ -150,6 +181,31 @@ namespace Project.UI
             DamagedRectAlphaChange(false, true);
         }
         
+        #endregion
+
+        #region Predictions
+
+        private void HandleRequestChanged()
+        {
+            HandleVisualFromPrediction(GetPredictionForRequest());
+        }
+
+        private HpNumberChecker.Prediction GetPredictionForRequest()
+        {
+            if (_robotService == null || _robotService.Request == null)   
+                return HpNumberChecker.Prediction.None;
+            return HpNumberChecker.PredictNumberResult(_hpNumber.CurrentValue, _robotService.Request);
+        }
+
+        private void HandleVisualFromPrediction(HpNumberChecker.Prediction prediction)
+        {
+            if (prediction == _currentPrediction)
+                return;
+            
+            _currentPrediction = prediction;
+            SetVisualsHereAndHow();
+        }
+
         #endregion
 
         #region Smooth
@@ -192,6 +248,42 @@ namespace Project.UI
 
         #endregion
 
+        protected override void SetColors(State state)
+        {
+            if (!canSetVisuals)
+                return;
+            
+            // god has abandoned me so i made this thing
+            Color bgColor = (state, _currentPrediction) switch
+            {
+                (State.None, HpNumberChecker.Prediction.None) => normalBgColor,
+                (State.None, HpNumberChecker.Prediction.Damage) => damageNormalBgColor,
+                (State.None, HpNumberChecker.Prediction.Success) => successNormalBgColor,
+
+                (State.Hover, HpNumberChecker.Prediction.None) => hoverBgColor,
+                (State.Hover, HpNumberChecker.Prediction.Damage) => damageHoverBgColor,
+                (State.Hover, HpNumberChecker.Prediction.Success) => successHoverBgColor,
+
+                (State.Pressed, HpNumberChecker.Prediction.None) => pressedBgColor,
+                (State.Pressed, HpNumberChecker.Prediction.Damage) => damagePressedBgColor,
+                (State.Pressed, HpNumberChecker.Prediction.Success) => successPressedBgColor,
+
+                _ => normalBgColor
+            };
+            
+            Color labelColor = state switch
+            {
+                State.None => normalTextColor,
+                State.Hover => hoverTextColor,
+                State.Pressed => pressedTextColor,
+                _ => normalTextColor
+            };
+            
+            if (background != null)
+                background.color = bgColor;
+            if (label != null)
+                label.color = labelColor;
+        }
 
         public override void OnPointerDown(PointerEventData eventData)
         {

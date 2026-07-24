@@ -6,6 +6,7 @@ using Project.Core;
 using Project.Core.Events;
 using Project.Core.Game;
 using Project.Core.Pause;
+using Project.Core.SaveSystem;
 using Project.Data;
 using Project.Game;
 using Project.UI;
@@ -17,6 +18,7 @@ namespace Project.Infrastructure
         [SerializeField] private ProjectConfigSO projectConfigSo;
         [SerializeField] private UILifetimeScope uiScope;
         [SerializeField] private SoundLifetimeScope soundScope;
+        [SerializeField] private GameSettingsSO gameSettingsSo;
         
         protected override void Configure(IContainerBuilder builder)
         {
@@ -43,6 +45,12 @@ namespace Project.Infrastructure
             
             // LEVEL CHOICE HOLDER
             builder.Register<GameLevelChoiceHolder>(Lifetime.Singleton);
+            
+            // REGISTER SAVE
+            builder.Register<SaveService>(Lifetime.Singleton).AsImplementedInterfaces();
+            
+            // REGISTER GAME DATA
+            builder.RegisterInstance(gameSettingsSo);
         }
     }
 }

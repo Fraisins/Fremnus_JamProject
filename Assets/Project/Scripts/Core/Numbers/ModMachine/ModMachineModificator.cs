@@ -4,37 +4,34 @@ namespace Project.Core.Numbers
 {
     public class ModMachineModificator
     {
-        private int _value = 0;
-        public int Value => _value;
-        
-        private bool _isTaken = false;
-        public bool IsTaken => _isTaken;
-        
+        public int Value { get; private set; } = 0;
+        public bool IsTaken { get; private set; } = false;
+
         public event Action<int> OnModValueChanged;
         public event Action<ModMachineModificator> OnFreeState;
         public event Action<bool> OnTakenStateChanged;
 
         public void SetModValue(int value)
         {
-            _value = value;
+            Value = value;
             OnModValueChanged?.Invoke(value);
         }
 
         public void SetTaken(bool isTaken)
         {
-            if (isTaken == _isTaken)
+            if (isTaken == IsTaken)
                 return;
             
-            if (_isTaken && !isTaken)
+            if (IsTaken && !isTaken)
                 OnFreeState?.Invoke(this);
             
-            _isTaken = isTaken;
+            IsTaken = isTaken;
             OnTakenStateChanged?.Invoke(isTaken);
         }
 
         public void ForceReset()
         {
-            _value = 0;
+            Value = 0;
         }
     }
 }

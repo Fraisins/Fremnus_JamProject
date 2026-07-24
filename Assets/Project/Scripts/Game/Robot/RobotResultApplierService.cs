@@ -12,7 +12,7 @@ namespace Project.Game.Robot
             _hpNumbersService = hpNumbersService;
         }
         
-        public void Punish(RobotRequestCheckResult result)
+        public void Apply(RobotRequestCheckResult result)
         {
             foreach (HpNumber number in _hpNumbersService.Numbers)
             {

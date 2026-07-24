@@ -19,10 +19,15 @@ namespace Project.Core.Events
 
     public readonly struct GameLevelFinishedEvent : IEvent
     {
+        public readonly string levelName;
         public readonly int successRobots;
-        public GameLevelFinishedEvent(int successRobots)
+        public readonly int totalRobots;
+        
+        public GameLevelFinishedEvent(string levelName, int successRobots, int totalRobots)
         {
+            this.levelName = levelName;
             this.successRobots = successRobots;
+            this.totalRobots = totalRobots;
         }
     }
 }

@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f307b425201e4ad69fe15c9533ac3664, type: 3}
   m_Name: GameLevelSettingsSO_Level3
   m_EditorClassIdentifier: Assembly-CSharp::Project.Game.GameLevelSettingsSO
+  <NextLevelName>k__BackingField: 
   robots:
     <MinAmount>k__BackingField: 2
     <MaxAmount>k__BackingField: 3
-    <MinPositive>k__BackingField: 1
+    <MinPositive>k__BackingField: 2
+    <MaxPositive>k__BackingField: 2
     <MinNegative>k__BackingField: 1
-    <RobotAmount>k__BackingField: 3
+    <MaxNegative>k__BackingField: 3
+    <RobotAmount>k__BackingField: 10

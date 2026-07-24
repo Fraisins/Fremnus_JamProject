@@ -49,12 +49,12 @@ namespace Project.Core.Robot
             _robotsStates.Clear();
         }
         
-        public int CountActivatedRobots()
+        public int CountSuccessRobots()
         {
             int count = 0;
             foreach (RobotState robotState in _robotsStates)
             {
-                if (robotState == RobotState.Active)
+                if (robotState == RobotState.Success)
                     count++;
             }
             return count;

@@ -36,12 +36,13 @@ namespace Project.Game.Robot
         private UniTask _loopTask;
         
         public event Action OnInitialized;
+        public event Action<RobotRequest> OnRequestStarted;
+        public event Action<RobotRequestCheckResult> OnRequestFinished;
+        public event Action<RobotsFinishedResult> OnRobotsOrderFinished;
 
         public RobotService(GameSettingsSO settings,
-            IHpNumbersService hpNumbersService,
-            IEventBus eventBus)
+            IHpNumbersService hpNumbersService)
         {
-            _eventBus = eventBus;
             _settings = settings.robots;
             _hpNumbersService = hpNumbersService;
             _requestChecker = new RobotRequestChecker(hpNumbersService);
@@ -62,7 +63,7 @@ namespace Project.Game.Robot
 
         public async UniTaskVoid StartRobotLoop(CancellationToken outsideToken = default)
         {
-            StopRobotLoop();
+            StopRobotLoop(); // cancel previous loop
             
             _order.Recreate(_levelSettings.robots.RobotAmount);
             
@@ -76,7 +77,9 @@ namespace Project.Game.Robot
                     token.ThrowIfCancellationRequested();
                     await NextRobot(token);
                 }
-                _eventBus.Publish(new GameLevelFinishedEvent(_order.CountActivatedRobots()));
+                OnRobotsOrderFinished?.Invoke(new RobotsFinishedResult(
+                    _order.CountSuccessRobots(),
+                    _order.RobotsStates.Count));
             }
             catch (OperationCanceledException)
             {
@@ -102,25 +105,35 @@ namespace Project.Game.Robot
                 await _conveyor.AddRobotAndMoveToStop();
                 combinedToken.ThrowIfCancellationRequested();
                 
+                OnRequestStarted?.Invoke(_request);
                 await _timer.StartTimer(_settings.requestTime, _forceTimerCts.Token).SuppressCancellationThrow();
+                
+                if (token.IsCancellationRequested) // NOT TIMER!
+                    return;
 
                 RobotRequestCheckResult result = _requestChecker.CheckRequest(_request);
                 if (result.FinishedPositive)
                 {
                     _order.SuccessCurrentRobot();
+                    
+                    _resultApplierService.Apply(result);
+                    OnRequestFinished?.Invoke(result);
+                    
                     await _conveyor.MoveRobotToEnd();
                 }
                 else
                 {
                     _order.FailCurrentRobot();
+                    
+                    _resultApplierService.Apply(result);
+                    OnRequestFinished?.Invoke(result);
+                    
                     await _conveyor.ReturnRobotToStart();
                 }
-
-                _resultApplierService.Punish(result);
             }
             catch (OperationCanceledException)
             {
-                // smth smth
+                // cancelled
             }
             catch (Exception e)
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Project.UI
 {
-    public class PauseMenuView : MonoBehaviour
+    public class PauseMenuView : GameUIMenu
     {
         private IPauseService _pauseService;
         

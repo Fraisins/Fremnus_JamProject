@@ -10,13 +10,13 @@ namespace Project.UI
         private class SubmenuData
         {
             public SubmenuType type;
-            public GameObject submenu;
+            public Submenu submenu;
         }
         
         [SerializeField] private List<SubmenuData> submenus;
         [SerializeField] private List<MenuOpenTrigger> triggers;
         
-        private Dictionary<SubmenuType, GameObject> _submenusDict;
+        private Dictionary<SubmenuType, Submenu> _submenusDict;
         private SubmenuType _currentSubmenu = SubmenuType.None;
 
         private void OnEnable()
@@ -44,10 +44,19 @@ namespace Project.UI
             _currentSubmenu = submenuType;
             
             if (_submenusDict == null) return;
-            foreach ((SubmenuType type, GameObject menu) in _submenusDict)
+            foreach ((SubmenuType type, Submenu menu) in _submenusDict)
             {
                 if (menu == null) continue;
-                menu.SetActive(_currentSubmenu == type);
+                if (_currentSubmenu == type)
+                {
+                    menu.gameObject.SetActive(true);
+                    menu.OnOpened();
+                }
+                else
+                {
+                    menu.gameObject.SetActive(false);
+                    menu.OnClosed();
+                }
             }
         }
         
@@ -79,7 +88,7 @@ namespace Project.UI
 
         private void InitializeDictionary()
         {
-            _submenusDict = new Dictionary<SubmenuType, GameObject>();
+            _submenusDict = new Dictionary<SubmenuType, Submenu>();
             foreach (SubmenuData data in submenus)
             {
                 if (data == null) continue;

@@ -10,12 +10,8 @@ namespace Project.Infrastructure
 {
     public class GameLifetimeScope : LifetimeScope
     {
-        [SerializeField] private GameSettingsSO settings;
-        
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterInstance(settings);
-            
             builder.Register<GameService>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             
             builder.Register<HpNumbersService>(Lifetime.Singleton).AsImplementedInterfaces();
