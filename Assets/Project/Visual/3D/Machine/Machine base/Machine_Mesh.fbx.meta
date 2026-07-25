@@ -3,7 +3,12 @@ guid: f9b6d79ce4a400343a9c9460d30a615e
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GambleMachine
+    second: {fileID: 2100000, guid: 025977eed96ac3f49ad727e2e54a729e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
