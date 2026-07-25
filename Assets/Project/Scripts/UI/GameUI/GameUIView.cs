@@ -1,4 +1,5 @@
-﻿using PrimeTween;
+﻿using System;
+using PrimeTween;
 using Project.Core;
 using UnityEngine;
 using VContainer;
@@ -16,6 +17,8 @@ namespace Project.UI
         public PauseMenuView PauseMenu => pauseMenu;
         public GameOverMenuView GameOverMenu => gameOverMenu;
         public LevelFinishedMenu LevelFinishedMenu => levelFinishedMenu;
+        
+        public event Action OnReturnToMainMenu;
 
         [Inject]
         public void Construct(ISceneService sceneService)
@@ -25,6 +28,7 @@ namespace Project.UI
 
         public void ReturnToMainMenu()
         {
+            OnReturnToMainMenu?.Invoke();
             _sceneService.OpenMenuFromGame();
         }
     }

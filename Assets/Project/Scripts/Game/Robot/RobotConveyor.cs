@@ -10,6 +10,10 @@ namespace Project.Game.Robot
 {
     public class RobotConveyor : MonoBehaviour
     {
+        [Header("Conveyor Mesh & Shader")]
+        [SerializeField] private Renderer conveyorRenderer;
+        [SerializeField] private Vector2 speedMultiplier = new(0f, 1f);
+        
         [SerializeField] private Transform movingPoint;
         
         [SerializeField] private Transform startPoint;
@@ -25,9 +29,13 @@ namespace Project.Game.Robot
         [Header("Robot randomness")] 
         [SerializeField] private List<RobotComponent> robotVariations;
         [SerializeField] private List<Sprite> randomFaceTextures;
+        [SerializeField] private float minRotation = 12f;
+        [SerializeField] private float maxRotation = 30f;
 
         [Header("Sound")] 
         [SerializeField] private AudioClip movingConveyorSound;
+        
+        private Material _conveyorMaterial; // cache
         
         private ISoundService _soundService;
         private RobotComponent _currentRobot;
@@ -41,7 +49,27 @@ namespace Project.Game.Robot
         private void Awake()
         {
             PrimeTweenConfig.warnStructBoxingAllocationInCoroutine = false; // shut
+            
+            if (conveyorRenderer != null)
+                _conveyorMaterial = conveyorRenderer.material; // cache or else it will make multiple instances
+            
+            // Test().Forget();
         }
+
+        // private async UniTaskVoid Test()
+        // {
+        //     await AddRobotAndMoveToStop();
+        //     await UniTask.WaitForSeconds(0.5f);
+        //     await MoveRobotToEnd();
+        //
+        //     await UniTask.WaitForSeconds(0.5f);
+        //     
+        //     await AddRobotAndMoveToStop();
+        //     await UniTask.WaitForSeconds(0.5f);
+        //     await ReturnRobotToStart();
+        // }
+        
+        #region ConveyorMovement
 
         public async UniTask AddRobotAndMoveToStop()
         {
@@ -52,14 +80,16 @@ namespace Project.Game.Robot
             AttachRandomRobotToMovingPoint();
             
             PlaySound(movingConveyorSound);
-            
-            await Tween.Position(
-                movingPoint, 
-                endValue: stopPoint.position, 
-                duration: startToStopDuration, 
-                ease: Ease.OutQuad
-            ).ToUniTask(cancellationToken: token)
-            .SuppressCancellationThrow();
+
+            await Sequence.Create()
+                .Group(Tween.Position(movingPoint, 
+                    endValue: stopPoint.position, 
+                    duration: startToStopDuration, 
+                    ease: Ease.OutQuad))
+                .Group(AnimateConveyorOffset(startToStopDuration, 
+                    Ease.OutQuad))
+                .ToUniTask(cancellationToken: token)
+                .SuppressCancellationThrow();
         }
 
         public async UniTask ReturnRobotToStart()
@@ -71,15 +101,20 @@ namespace Project.Game.Robot
             
             PlaySound(movingConveyorSound);
             
-            bool isCanceled = await Tween.Position(
-                movingPoint, 
-                endValue: startPoint.position, 
-                duration: startToStopDuration, 
-                ease: Ease.OutQuad
-            ).ToUniTask(cancellationToken: token)
-            .SuppressCancellationThrow();
+            bool isCanceled = await Sequence.Create()
+                .Group(Tween.Position(movingPoint, 
+                    endValue: startPoint.position, 
+                    duration: startToStopDuration, 
+                    ease: Ease.OutQuad))
+                .Group(AnimateConveyorOffset(
+                    startToStopDuration, 
+                    Ease.OutQuad,
+                    directionMultiplier: -1f))
+                .ToUniTask(cancellationToken: token)
+                .SuppressCancellationThrow();
             
-            if (isCanceled) return;
+            if (isCanceled) 
+                return;
             
             ReturnRobot();
         }
@@ -93,15 +128,19 @@ namespace Project.Game.Robot
             
             PlaySound(movingConveyorSound);
             
-            bool isCanceled = await Tween.Position(
-                movingPoint, 
-                endValue: endPoint.position, 
-                duration: stopToEndDuration, 
-                ease: Ease.OutQuad
-            ).ToUniTask(cancellationToken: token)
-            .SuppressCancellationThrow();
+            bool isCanceled = await Sequence.Create()
+                .Group(Tween.Position(movingPoint, 
+                    endValue: endPoint.position, 
+                    duration: stopToEndDuration, 
+                    ease: Ease.OutQuad))
+                .Group(AnimateConveyorOffset(
+                    startToStopDuration, 
+                    Ease.OutQuad))
+                .ToUniTask(cancellationToken: token)
+                .SuppressCancellationThrow();
             
-            if (isCanceled) return;
+            if (isCanceled) 
+                return;
             
             ReturnRobot();
         }
@@ -127,17 +166,42 @@ namespace Project.Game.Robot
             _currentRobot = null;
         }
 
+        private Tween AnimateConveyorOffset(float duration, Ease ease, float directionMultiplier = 1f)
+        {
+            if (_conveyorMaterial == null) return default;
+            
+            Vector2 startOffset = _conveyorMaterial.mainTextureOffset;
+            Vector2 targetOffset = startOffset + speedMultiplier * directionMultiplier;
+
+            return Tween.Custom(
+                startValue: startOffset,
+                endValue: targetOffset,
+                duration: duration,
+                ease: ease,
+                onValueChange: newOffset => 
+                    _conveyorMaterial.mainTextureOffset = newOffset);
+        }
+
+        #endregion
+
+        #region Randomness
+        
         private RobotComponent TakeOutRandomRobot()
         { 
             if (robotVariations == null || robotVariations.Count == 0) return null;
-            int randomIndex = UnityEngine.Random.Range(0, robotVariations.Count);
+            int randomIndex = Random.Range(0, robotVariations.Count);
             RobotComponent robot = robotVariations[randomIndex];
             
             if (randomFaceTextures != null && randomFaceTextures.Count > 0)
-                robot.SetFaceTexture(randomFaceTextures[UnityEngine.Random.Range(0, randomFaceTextures.Count)]);
+                robot.SetFaceTexture(randomFaceTextures[Random.Range(0, randomFaceTextures.Count)]);
+            
+            float randomRot = Random.Range(minRotation, maxRotation);
+            robot.transform.rotation = Quaternion.Euler(0f, randomRot, 0f);
             
             return robot;
         }
+
+        #endregion
 
         #region Sound
 

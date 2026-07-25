@@ -15,25 +15,24 @@ namespace Project.UI
         private readonly IEventBus _eventBus;
         private readonly Func<GameUIView> _uiFactory;
         private readonly IPauseService _pauseService;
-        private readonly IGameService _gameService;
         private readonly Transform _uiContainer;
         
         private GameUIView _gameUI;
         private readonly Tween _menuShowTween;
 
         public GameUIHandler(IEventBus eventBus, Func<GameUIView> uiFactory, PersistentUIContainer persistentUIContainer, 
-            IPauseService pauseService, IGameService gameService)
+            IPauseService pauseService)
         {
             _eventBus = eventBus;
             _uiFactory = uiFactory;
             _uiContainer = persistentUIContainer.Container;
             _pauseService = pauseService;
-            _gameService = gameService;
         }
 
         public void Initialize()
         {
             _gameUI = _uiFactory();
+            _gameUI.OnReturnToMainMenu += HandleReturnToMainMenu;
             
             _eventBus.Subscribe<GamePausedEvent>(ShowPauseMenu);
             _eventBus.Subscribe<GameResumedEvent>(HidePauseMenu);
@@ -115,11 +114,25 @@ namespace Project.UI
         }
         
         #endregion
+
+        #region Other
+
+        private void HandleReturnToMainMenu()
+        {
+            _pauseService.SetCanBePaused(true); 
+            // resets can be paused value, since player can return to the main menu from
+            // gameover and hide level finished menus
+        }
+
+        #endregion
         
         public void Dispose()
         {
             if (_gameUI == null) return;
+            
             _gameUI.gameObject.SetActive(false);
+            _gameUI.OnReturnToMainMenu -= HandleReturnToMainMenu;
+            
             Object.Destroy(_gameUI.gameObject);
             
             _eventBus.Unsubscribe<GamePausedEvent>(ShowPauseMenu);

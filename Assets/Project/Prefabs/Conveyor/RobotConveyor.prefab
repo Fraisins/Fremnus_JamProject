@@ -242,8 +242,11 @@ MonoBehaviour:
   - {fileID: 5177256021211421631}
   - {fileID: 5746612940181702299}
   randomFaceTextures:
-  - {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 1120185907, guid: 371693939bfa8bd47bb03b35e499875c, type: 3}
+  - {fileID: 1687983460, guid: 371693939bfa8bd47bb03b35e499875c, type: 3}
+  - {fileID: -202483749, guid: 371693939bfa8bd47bb03b35e499875c, type: 3}
+  - {fileID: -1613661410, guid: 371693939bfa8bd47bb03b35e499875c, type: 3}
+  - {fileID: 161850816, guid: 371693939bfa8bd47bb03b35e499875c, type: 3}
   movingConveyorSound: {fileID: 8300000, guid: 52980f3611a99c644b2558bdf77696b1, type: 3}
 --- !u!1 &6495937930794353291
 GameObject:

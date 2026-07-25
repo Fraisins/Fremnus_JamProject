@@ -19,7 +19,10 @@ namespace Project.Core.Pause
         
         public void Pause(bool showPauseMenu = true)
         {
+            Debug.Log($"[Pause Service] IsPaused: {IsPaused}, CanBePaused: {CanBePaused}, CanBeResumed: {CanBeResumed}");
             if (IsPaused || !CanBePaused) return;
+            
+            Debug.Log("[Pause Service] Game paused!");
             
             Time.timeScale = 0f;
             IsPaused = true;
@@ -29,6 +32,9 @@ namespace Project.Core.Pause
         public void Resume()
         {
             if (!IsPaused || !CanBeResumed) return;
+            
+            
+            Debug.Log("[Pause Service] Game resumed!");
             
             Time.timeScale = 1f;
             IsPaused = false;
@@ -41,7 +47,14 @@ namespace Project.Core.Pause
             else Resume();
         }
 
-        public void SetCanBePaused(bool canBePaused) => CanBePaused = canBePaused;
-        public void SetCanBeResumed(bool canBeResumed) => CanBeResumed = canBeResumed;
+        public void SetCanBePaused(bool canBePaused)
+        {
+            CanBePaused = canBePaused;
+        }
+
+        public void SetCanBeResumed(bool canBeResumed)
+        {
+            CanBeResumed = canBeResumed;
+        }
     }
 }

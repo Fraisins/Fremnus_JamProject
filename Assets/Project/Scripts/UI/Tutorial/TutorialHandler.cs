@@ -10,6 +10,8 @@ namespace Project.UI.Tutorial
 {
     public class TutorialHandler : IInitializable, IDisposable
     {
+        private bool _tutorialFinished = false;
+        
         private readonly IRobotService _robotService;
         private readonly GameLevelChoiceHolder _levelHolder;
         private readonly TutorialLevelManager _tutorialLevelManager;
@@ -33,6 +35,11 @@ namespace Project.UI.Tutorial
 
         private void HandleOnRequestStarted(RobotRequest request)
         {
+            _robotService.OnRequestStarted += HandleOnRequestStarted;
+            
+            if (_tutorialFinished)
+                return;
+            
             _cts = new CancellationTokenSource();
             HandleRequestStartedWithDelay(0.75f, _cts.Token).Forget();
         }
@@ -63,7 +70,7 @@ namespace Project.UI.Tutorial
             _cts?.Dispose();
             _cts = null;
             
-            _robotService.OnRequestStarted -= HandleOnRequestStarted;
+            _tutorialFinished = true;
             _tutorialLevelManager.OnTutorialFinished -= HandleTutorialFinished;
             _pauseService.SetCanBeResumed(true);
             _pauseService.Resume();
