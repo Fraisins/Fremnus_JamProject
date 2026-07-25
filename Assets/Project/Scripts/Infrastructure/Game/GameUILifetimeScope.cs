@@ -12,8 +12,17 @@ namespace Project.Infrastructure
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponentInNewPrefab(gameUIPrefab, Lifetime.Scoped);
-            builder.RegisterEntryPoint<GameUIHandler>(Lifetime.Scoped);
+            builder.RegisterFactory<GameUIView>(resolver =>
+            {
+                return () =>
+                {
+                    GameUIView instance = Instantiate(gameUIPrefab);
+                    resolver.InjectGameObject(instance.gameObject);
+                    return instance;
+                };
+            }, Lifetime.Singleton);
+            
+            builder.RegisterEntryPoint<GameUIHandler>();
         }
     }
 }

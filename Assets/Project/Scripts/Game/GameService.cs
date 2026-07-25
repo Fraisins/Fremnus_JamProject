@@ -125,6 +125,12 @@ namespace Project.Game
         {
             if (_isGameFinished) // CHECKS IF GAME OVER HAPPENED AT THE LAST LINE!
                 return;
+
+            if (result.successAmount == 0)
+            {
+                _eventBus.Publish<GameOverEvent>(default);
+                return;
+            }
             
             _isGameFinished = true;
 

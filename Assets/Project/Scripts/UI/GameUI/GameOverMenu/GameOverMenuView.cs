@@ -1,7 +1,6 @@
 ﻿using System;
-using Project.Core.Events;
 using Project.Core.Game;
-using UnityEngine;
+using VContainer;
 
 namespace Project.UI
 {
@@ -10,7 +9,8 @@ namespace Project.UI
         private IGameService _gameService;
         public event Action OnHideRequested;
 
-        public void Init(IGameService gameService)
+        [Inject]
+        public void Construct(IGameService gameService)
         {
             _gameService = gameService;
         }

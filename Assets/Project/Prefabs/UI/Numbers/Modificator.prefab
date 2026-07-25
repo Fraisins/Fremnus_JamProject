@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6112457318212513326}
   - component: {fileID: 5693493370788630320}
+  - component: {fileID: -7405187163601770370}
+  - component: {fileID: 1471894895024148489}
   m_Layer: 0
   m_Name: Modificator
   m_TagString: Untagged
@@ -74,6 +76,33 @@ MonoBehaviour:
       m_Calls: []
   selectedScaleMultiplier: 0.8
   selectedAnimationDuration: 0.15
+--- !u!114 &-7405187163601770370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998492023307306435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cc65bf5cfc4f779db58c003bce9d0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.UI.CustomButtonSoundPlayer
+  hoverSound: {fileID: 8300000, guid: ce704d3e79a77284a9e6b4139c26ad2e, type: 3}
+  pressSound: {fileID: 8300000, guid: cd4f33c41f83ebe4c8b1eb31058e253d, type: 3}
+--- !u!114 &1471894895024148489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998492023307306435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f6d9c261ff42c5a8f01b3779a58500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.UI.ButtonLockController
+  lockWhenPaused: 1
 --- !u!1 &2155287744930543192
 GameObject:
   m_ObjectHideFlags: 0

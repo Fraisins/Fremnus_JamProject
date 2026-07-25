@@ -10,11 +10,15 @@ namespace Project.Infrastructure
     public class SoundLifetimeScope : IInstaller
     {
         [SerializeField] private SoundSources sources;
+        [SerializeField] private MusicSettingsSO musicSettings;
         
         public void Install(IContainerBuilder builder)
         {
             builder.RegisterInstance(sources);
+            builder.RegisterInstance(musicSettings);
+            
             builder.Register<SoundService>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<MusicHandler>(Lifetime.Singleton).AsImplementedInterfaces();
         }
     }
 }

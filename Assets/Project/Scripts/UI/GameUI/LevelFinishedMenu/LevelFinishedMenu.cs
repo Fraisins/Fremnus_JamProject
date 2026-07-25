@@ -2,6 +2,7 @@
 using PrimeTween;
 using Project.Core.Game;
 using UnityEngine;
+using VContainer;
 
 namespace Project.UI
 {
@@ -11,7 +12,13 @@ namespace Project.UI
         public event Action OnHideRequested;
         
         [SerializeField] private CustomButton nextLevelButton;
-
+        
+        [Inject]
+        public void Construct(IGameService gameService)
+        {
+            _gameService = gameService;
+        }
+        
         private void OnEnable()
         {
             if (nextLevelButton == null)
@@ -30,11 +37,6 @@ namespace Project.UI
                 return;
             }
             nextLevelButton.onPressed.RemoveListener(TriggerOpenNextLevel);
-        }
-
-        public void Init(IGameService gameService)
-        {
-            _gameService = gameService;
         }
 
         public override Tween PlayAppear()

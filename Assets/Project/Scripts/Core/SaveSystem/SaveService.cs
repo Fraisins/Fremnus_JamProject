@@ -14,6 +14,12 @@ namespace Project.Core.SaveSystem
         
         public void SaveFinishedLevel(string levelName, GameLevelFinishedEvent evt)
         {
+            if (TryGetLevelData(levelName, out SaveData.LevelData foundData))
+            {
+                if (foundData.robotSuccessValue > evt.successRobots)
+                    return;
+            }
+            
             SaveData.LevelData levelData = new(evt.successRobots);
             _saveData.SetLevelData(levelName, levelData);
             SaveDataConverter.Save(_saveData);

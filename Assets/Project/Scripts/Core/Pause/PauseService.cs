@@ -10,24 +10,25 @@ namespace Project.Core.Pause
         private readonly IEventBus _eventBus;
         public bool IsPaused { get; private set; } = false;
         public bool CanBePaused { get; private set; } = true;
+        public bool CanBeResumed { get; private set; } = true;
         
         public PauseService(IEventBus eventBus)
         {
             _eventBus = eventBus;
         }
         
-        public void Pause()
+        public void Pause(bool showPauseMenu = true)
         {
             if (IsPaused || !CanBePaused) return;
             
             Time.timeScale = 0f;
             IsPaused = true;
-            _eventBus.Publish<GamePausedEvent>(default);
+            _eventBus.Publish(new GamePausedEvent(showPauseMenu));
         }
 
         public void Resume()
         {
-            if (!IsPaused) return;
+            if (!IsPaused || !CanBeResumed) return;
             
             Time.timeScale = 1f;
             IsPaused = false;
@@ -41,5 +42,6 @@ namespace Project.Core.Pause
         }
 
         public void SetCanBePaused(bool canBePaused) => CanBePaused = canBePaused;
+        public void SetCanBeResumed(bool canBeResumed) => CanBeResumed = canBeResumed;
     }
 }

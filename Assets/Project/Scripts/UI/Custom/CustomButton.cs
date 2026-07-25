@@ -47,10 +47,11 @@ namespace Project.UI
 
         protected bool isActive = true;
         protected bool canSetVisuals = true;
+        protected bool isLocked = false; // locked by lock conditions, visually the same
 
         // public
         public Transform VisualChild => visualChild;
-
+        
         private void OnDisable()
         {
             ResetState();
@@ -65,7 +66,7 @@ namespace Project.UI
         
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
-            if (!isActive)
+            if (!isActive || isLocked)
                 return;
             
             IsHovering = true;
@@ -77,7 +78,7 @@ namespace Project.UI
 
         public virtual void OnPointerExit(PointerEventData eventData)
         {
-            if (!isActive)
+            if (!isActive || isLocked)
                 return;
             
             IsHovering = false;
@@ -89,7 +90,7 @@ namespace Project.UI
 
         public virtual void OnPointerDown(PointerEventData eventData)
         {
-            if (!isActive)
+            if (!isActive || isLocked)
                 return;
             
             IsPressed = true;
@@ -101,7 +102,7 @@ namespace Project.UI
 
         public virtual void OnPointerUp(PointerEventData eventData)
         {
-            if (!isActive)
+            if (!isActive || isLocked)
                 return;
             
             IsPressed = false;
@@ -158,6 +159,8 @@ namespace Project.UI
             else
                 SetColors(State.None);
         }
+        
+        public void SetLocked(bool locked) => isLocked = locked;
         
         #if UNITY_EDITOR
         private void OnValidate()
