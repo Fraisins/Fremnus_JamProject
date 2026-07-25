@@ -1,5 +1,6 @@
 ﻿using Project.Core.Pause;
 using UnityEngine;
+using VContainer;
 
 namespace Project.UI
 {
@@ -7,7 +8,8 @@ namespace Project.UI
     {
         private IPauseService _pauseService;
         
-        public void Init(IPauseService pauseService)
+        [Inject]
+        public void Construct(IPauseService pauseService)
         {
             _pauseService = pauseService;
         }

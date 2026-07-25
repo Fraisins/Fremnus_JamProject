@@ -1,4 +1,5 @@
-﻿using Project.Core.Robot;
+﻿using System;
+using Project.Core.Robot;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,21 +9,23 @@ namespace Project.Scripts.UI
     {
         [SerializeField] private Image image;
         
-        [SerializeField] private Color activeColor;
-        [SerializeField] private Color unactiveColor;
-        [SerializeField] private Color failedColor;
-        [SerializeField] private Color successColor;
+        private RobotState _currentState = RobotState.NotStarted;
+        public event Action<RobotLightView, RobotState> OnStateChanged;
 
         public void SetState(RobotState state)
         {
-            Color color = state switch
-            {
-                RobotState.Active => activeColor,
-                RobotState.Failed => failedColor,
-                RobotState.Success => successColor,
-                RobotState.NotStarted => unactiveColor,
-                _ => Color.white
-            };
+            if (_currentState == state)
+                return;
+            
+            _currentState = state;
+            OnStateChanged?.Invoke(this, _currentState);
+        }
+
+        public void SetColor(Color color)
+        {
+            if (image == null)
+                return;
+            
             image.color = color;
         }
     }

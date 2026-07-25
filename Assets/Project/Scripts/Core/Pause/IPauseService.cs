@@ -6,11 +6,13 @@ namespace Project.Core.Pause
     {
         public bool IsPaused { get; }
         public bool CanBePaused { get; }
+        public bool CanBeResumed { get; }
         
-        public void Pause();
+        public void Pause(bool showPauseMenu = true);
         public void Resume();
         public void TogglePause();
         
         public void SetCanBePaused(bool canBePaused);
+        public void SetCanBeResumed(bool canBeResumed);
     }
 }

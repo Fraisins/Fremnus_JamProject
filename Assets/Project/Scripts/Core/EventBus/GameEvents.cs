@@ -2,7 +2,16 @@
 
 namespace Project.Core.Events
 {
-    public readonly struct GamePausedEvent : IEvent { }
+    public readonly struct GamePausedEvent : IEvent
+    {
+        public readonly bool showPauseMenu;
+
+        public GamePausedEvent(bool showPauseMenu)
+        {
+            this.showPauseMenu = showPauseMenu;
+        }
+    }
+    
     public readonly struct GameResumedEvent : IEvent { }
     
     public readonly struct GameStateChangedEvent : IEvent

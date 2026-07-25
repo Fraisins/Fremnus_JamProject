@@ -86,6 +86,8 @@ GameObject:
   - component: {fileID: 2856440309454032940}
   - component: {fileID: 3280008995727611607}
   - component: {fileID: 3253789486833627636}
+  - component: {fileID: 1083658391157154673}
+  - component: {fileID: -8270293837873599210}
   m_Layer: 0
   m_Name: HpNumber
   m_TagString: Untagged
@@ -168,6 +170,33 @@ MonoBehaviour:
   successNormalBgColor: {r: 0.22739409, g: 0.6603774, b: 0.33122596, a: 1}
   successHoverBgColor: {r: 0.40610537, g: 0.735849, b: 0.47366703, a: 1}
   successPressedBgColor: {r: 0.47592562, g: 0.8773585, b: 0.58576393, a: 1}
+--- !u!114 &1083658391157154673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800845644585254970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cc65bf5cfc4f779db58c003bce9d0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.UI.CustomButtonSoundPlayer
+  hoverSound: {fileID: 8300000, guid: ce704d3e79a77284a9e6b4139c26ad2e, type: 3}
+  pressSound: {fileID: 8300000, guid: 93dead18e3a78114298cd14ae4387722, type: 3}
+--- !u!114 &-8270293837873599210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800845644585254970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f6d9c261ff42c5a8f01b3779a58500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.UI.ButtonLockController
+  lockWhenPaused: 1
 --- !u!1 &1742168324981540692
 GameObject:
   m_ObjectHideFlags: 0

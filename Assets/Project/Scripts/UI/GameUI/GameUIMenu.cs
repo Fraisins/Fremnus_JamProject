@@ -1,15 +1,25 @@
-﻿using System;
-using PrimeTween;
+﻿using PrimeTween;
+using Project.Sound;
 using UnityEngine;
+using VContainer;
 
 namespace Project.UI
 {
     public class GameUIMenu : MonoBehaviour
     {
-        [Header("Appearance animation")]
+        private ISoundService _soundService;
+        public bool IsActive { get; protected set; }
         
+        [Header("Appearance animation")]
         [SerializeField] protected float appearDuration = 0.25f;
         [SerializeField] protected float disappearDuration = 0.10f;
+        [SerializeField] protected AudioClip appearClip;
+
+        [Inject]
+        private void Construct(ISoundService soundService)
+        {
+            _soundService = soundService;
+        }
         
         private Tween _appearanceTween;
         private float _originalYScale;
@@ -24,6 +34,9 @@ namespace Project.UI
             if (_appearanceTween.isAlive)
                 _appearanceTween.Stop();
 
+            IsActive = true;
+            PlayAppearSound();
+            
             transform.localScale = new Vector3(
                 transform.localScale.x,
                 0f,
@@ -44,6 +57,9 @@ namespace Project.UI
             if (_appearanceTween.isAlive)
                 _appearanceTween.Stop();
             
+            IsActive = false;
+            PlayAppearSound();
+            
             _appearanceTween = Tween.ScaleY(
                 transform, 
                 0f, 
@@ -52,6 +68,19 @@ namespace Project.UI
                 useUnscaledTime: true);
             
             return _appearanceTween;
+        }
+
+        public void PlayAppearSound()
+        {
+            if (_soundService == null)
+            {
+                Debug.LogWarning("[GameUIMenu] Sound Service is null");
+                return;
+            }
+            if (appearClip == null)
+                return;
+            
+            _soundService.PlaySfx(appearClip);
         }
 
         private void OnDestroy()

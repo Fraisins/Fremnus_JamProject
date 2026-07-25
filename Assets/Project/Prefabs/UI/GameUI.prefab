@@ -53,6 +53,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.PauseMenuView
   appearDuration: 0.25
+  disappearDuration: 0.1
+  appearClip: {fileID: 8300000, guid: 88b136c3ea4ae3444b82086c552b23e6, type: 3}
 --- !u!1 &2360029382775041991
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,6 +470,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.LevelFinishedMenu
   appearDuration: 0.25
+  disappearDuration: 0.1
+  appearClip: {fileID: 8300000, guid: 88b136c3ea4ae3444b82086c552b23e6, type: 3}
   nextLevelButton: {fileID: 2683583354030122508}
 --- !u!1 &5245196529056961863
 GameObject:
@@ -1053,6 +1057,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.GameOverMenuView
   appearDuration: 0.25
+  disappearDuration: 0.1
+  appearClip: {fileID: 8300000, guid: 88b136c3ea4ae3444b82086c552b23e6, type: 3}
 --- !u!1 &8886339950058156212
 GameObject:
   m_ObjectHideFlags: 0

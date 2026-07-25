@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using PrimeTween;
+using Project.Sound;
 using UnityEngine;
+using VContainer;
 
 namespace Project.Game.Robot
 {
@@ -20,10 +21,23 @@ namespace Project.Game.Robot
         [SerializeField] private float delayBeforeMoveFromStop;
         
         [SerializeField] private Transform robotTrashContainer;
-        [SerializeField] private List<GameObject> robotVariations;
-        
-        private GameObject _currentRobot;
 
+        [Header("Robot randomness")] 
+        [SerializeField] private List<RobotComponent> robotVariations;
+        [SerializeField] private List<Sprite> randomFaceTextures;
+
+        [Header("Sound")] 
+        [SerializeField] private AudioClip movingConveyorSound;
+        
+        private ISoundService _soundService;
+        private RobotComponent _currentRobot;
+
+        [Inject]
+        private void Construct(ISoundService soundService)
+        {
+            _soundService = soundService;
+        }
+        
         private void Awake()
         {
             PrimeTweenConfig.warnStructBoxingAllocationInCoroutine = false; // shut
@@ -36,6 +50,8 @@ namespace Project.Game.Robot
             
             movingPoint.position = startPoint.position;
             AttachRandomRobotToMovingPoint();
+            
+            PlaySound(movingConveyorSound);
             
             await Tween.Position(
                 movingPoint, 
@@ -52,6 +68,8 @@ namespace Project.Game.Robot
             CancellationToken token = this.GetCancellationTokenOnDestroy();
             
             await UniTask.WaitForSeconds(delayBeforeMoveFromStop, cancellationToken: token);
+            
+            PlaySound(movingConveyorSound);
             
             bool isCanceled = await Tween.Position(
                 movingPoint, 
@@ -73,6 +91,8 @@ namespace Project.Game.Robot
             
             await UniTask.WaitForSeconds(delayBeforeMoveFromStop, cancellationToken: token);
             
+            PlaySound(movingConveyorSound);
+            
             bool isCanceled = await Tween.Position(
                 movingPoint, 
                 endValue: endPoint.position, 
@@ -90,24 +110,52 @@ namespace Project.Game.Robot
         {
             if (robotVariations == null || robotVariations.Count == 0) return;
 
-            if (_currentRobot != null)
-            {
-                _currentRobot.transform.SetParent(robotTrashContainer);
-                _currentRobot.transform.localPosition = Vector3.zero;
-            }
+            ReturnRobot();
             
-            GameObject robot = robotVariations[UnityEngine.Random.Range(0, robotVariations.Count)];
-            
-            _currentRobot = robot;
+            _currentRobot = TakeOutRandomRobot();;
             _currentRobot.transform.SetParent(movingPoint);
             _currentRobot.transform.localPosition = Vector3.zero;
         }
 
         private void ReturnRobot()
         {
+            if (_currentRobot == null)
+                return;
+            
             _currentRobot.transform.SetParent(robotTrashContainer);
             _currentRobot.transform.localPosition = Vector3.zero;
             _currentRobot = null;
         }
+
+        private RobotComponent TakeOutRandomRobot()
+        { 
+            if (robotVariations == null || robotVariations.Count == 0) return null;
+            int randomIndex = UnityEngine.Random.Range(0, robotVariations.Count);
+            RobotComponent robot = robotVariations[randomIndex];
+            
+            if (randomFaceTextures != null && randomFaceTextures.Count > 0)
+                robot.SetFaceTexture(randomFaceTextures[UnityEngine.Random.Range(0, randomFaceTextures.Count)]);
+            
+            return robot;
+        }
+
+        #region Sound
+
+        private void PlaySound(AudioClip clip)
+        {
+            if (clip == null)
+            {
+                Debug.LogWarning("Sound clip is null");
+                return;
+            }
+            if (_soundService == null)
+            {
+                Debug.LogWarning("[RobotConveyor]: SoundService is null");
+                return;
+            }
+            _soundService.PlaySfx(clip);
+        }
+
+        #endregion
     }
 }

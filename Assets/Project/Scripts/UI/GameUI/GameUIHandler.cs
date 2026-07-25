@@ -1,36 +1,40 @@
-﻿using PrimeTween;
+﻿using System;
+using PrimeTween;
 using Project.Core.Events;
 using Project.Core.Game;
 using Project.Core.Pause;
 using UnityEngine;
+using VContainer;
 using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 namespace Project.UI
 {
     public class GameUIHandler : IInitializable, IStartable, System.IDisposable
     {
         private readonly IEventBus _eventBus;
+        private readonly Func<GameUIView> _uiFactory;
         private readonly IPauseService _pauseService;
-        
-        private readonly GameUIView _gameUI;
+        private readonly IGameService _gameService;
         private readonly Transform _uiContainer;
         
+        private GameUIView _gameUI;
         private readonly Tween _menuShowTween;
 
-        public GameUIHandler(IEventBus eventBus, GameUIView gameUI, PersistentUIContainer persistentUIContainer, 
+        public GameUIHandler(IEventBus eventBus, Func<GameUIView> uiFactory, PersistentUIContainer persistentUIContainer, 
             IPauseService pauseService, IGameService gameService)
         {
             _eventBus = eventBus;
-            _gameUI = gameUI;
+            _uiFactory = uiFactory;
             _uiContainer = persistentUIContainer.Container;
             _pauseService = pauseService;
-            _gameUI.PauseMenu.Init(_pauseService);
-            _gameUI.GameOverMenu.Init(gameService);
-            _gameUI.LevelFinishedMenu.Init(gameService);
+            _gameService = gameService;
         }
 
         public void Initialize()
         {
+            _gameUI = _uiFactory();
+            
             _eventBus.Subscribe<GamePausedEvent>(ShowPauseMenu);
             _eventBus.Subscribe<GameResumedEvent>(HidePauseMenu);
             
@@ -55,12 +59,17 @@ namespace Project.UI
 
         private void ShowPauseMenu(GamePausedEvent gamePausedEvent)
         {
+            if (!gamePausedEvent.showPauseMenu)
+                return;
             _gameUI.PauseMenu.gameObject.SetActive(true);
             _gameUI.PauseMenu.PlayAppear();
         }
 
         private void HidePauseMenu(GameResumedEvent gameResumedEvent)
         {
+            if (!_gameUI.PauseMenu.IsActive)
+                return;
+            
             _gameUI.PauseMenu.PlayHide().OnComplete(()
                 => _gameUI.PauseMenu.gameObject.SetActive(false));
         }

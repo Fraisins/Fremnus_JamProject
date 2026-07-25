@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using Project.Core.Events;
 using Project.Core.Numbers;
+using Project.Core.Robot;
 using UnityEngine;
 
 namespace Project.Game.Numbers
 {
     public class ModMachineService : IModMachineService, IDisposable
     {
-        private readonly IEventBus _eventBus;
-        private readonly ModMachineGenerator _generator = new();
+        private readonly IHpNumbersService _hpNumbersService;
+        private readonly IRobotService _robotService;
+        
+        private readonly ModMachineGenerator _generator;
         
         private ModMachineModificator _currentModificator;
         private List<ModMachineModificator> _modificators;
@@ -24,6 +27,14 @@ namespace Project.Game.Numbers
         
         public event Action<ModMachineModificator> OnModificatorSelected;
         public event Action OnModificatorUnselected;
+
+        public ModMachineService(IHpNumbersService hpNumbersService, IRobotService robotService)
+        {
+            _hpNumbersService = hpNumbersService;
+            _robotService = robotService;
+            
+            _generator = new ModMachineGenerator(hpNumbersService, robotService);
+        }
 
         #region Create / Reset
         

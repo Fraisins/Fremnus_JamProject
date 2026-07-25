@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using PrimeTween;
 using Project.Core.Robot;
+using Project.Sound;
 using UnityEngine;
 using VContainer;
 
@@ -15,9 +16,13 @@ namespace Project.Scripts.UI
         [SerializeField] private Transform visibilityTransform;
         [SerializeField] private float appearanceDuration = 0.15f;
         [SerializeField] private float tiltRotation = 15f;
+
+        [Header("Sounds")] 
+        [SerializeField] private AudioClip requestAppearSound;
         
         private RobotRequest _request;
         private IRobotService _robotService;
+        private ISoundService _soundService;
 
         private bool _isActive = false;
         private Vector3 _originalScale;
@@ -26,8 +31,9 @@ namespace Project.Scripts.UI
         private List<RobotRequestLetter> _visibleLetters = new();
 
         [Inject]
-        public void Construct(IRobotService robotService)
+        public void Construct(IRobotService robotService, ISoundService soundService)
         {
+            _soundService = soundService;
             _robotService = robotService;
             _request = robotService.Request;
             
@@ -124,6 +130,9 @@ namespace Project.Scripts.UI
 
             visibilityTransform.localScale = Vector3.zero;
             visibilityTransform.localRotation = Quaternion.Euler(0f, 0f, tiltRotation);
+
+            if (_soundService != null && requestAppearSound != null)
+                _soundService.PlaySfx(requestAppearSound);
             
             SetLettersVisibility(true);
 

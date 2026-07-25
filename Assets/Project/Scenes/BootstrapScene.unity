@@ -307,6 +307,7 @@ MonoBehaviour:
     sources:
       sfxSource: {fileID: 1504151732}
       musicSource: {fileID: 2080502214}
+    musicSettings: {fileID: 11400000, guid: d9a209843148ff543927f60deef59638, type: 2}
   gameSettingsSo: {fileID: 11400000, guid: 065b7fadb40ee084ea4c860d0dcb13eb, type: 2}
 --- !u!4 &1284770318
 Transform:

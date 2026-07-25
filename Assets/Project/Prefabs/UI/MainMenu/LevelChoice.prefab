@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4297720922263695101}
   - component: {fileID: 8057896746738118231}
+  - component: {fileID: 3290482887910072015}
   m_Layer: 0
   m_Name: LevelChoice
   m_TagString: Untagged
@@ -77,6 +78,20 @@ MonoBehaviour:
   levelName: Level0
   additionalInfoText: {fileID: 6420550982701836276}
   disabledBackgroundColor: {r: 0.20784315, g: 0.29411766, b: 0.24313727, a: 0.69411767}
+--- !u!114 &3290482887910072015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207120836358316769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cc65bf5cfc4f779db58c003bce9d0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.UI.CustomButtonSoundPlayer
+  hoverSound: {fileID: 8300000, guid: ce704d3e79a77284a9e6b4139c26ad2e, type: 3}
+  pressSound: {fileID: 8300000, guid: cd4f33c41f83ebe4c8b1eb31058e253d, type: 3}
 --- !u!1 &1527013494649156531
 GameObject:
   m_ObjectHideFlags: 0
