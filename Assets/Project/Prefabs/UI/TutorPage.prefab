@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.015352436, g: 0.4584642, b: 0.6509434, a: 1}
+  m_Color: {r: 0.19188322, g: 0.33002546, b: 0.5283019, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -456,10 +456,10 @@ RectTransform:
   - {fileID: 8079629959380327235}
   m_Father: {fileID: 2835561074452039669}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7246799061095148057
 GameObject:
@@ -514,11 +514,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.CustomButton
   background: {fileID: 24430142006078455}
   label: {fileID: 3638023483885269978}
-  visualChild: {fileID: 4764772604297632747}
+  visualChild: {fileID: 4672308185298913244}
   text: NEXT
-  normalBgColor: {r: 0.015352436, g: 0.4584642, b: 0.6509434, a: 1}
-  hoverBgColor: {r: 0, g: 0.43921572, b: 0.62352943, a: 1}
-  pressedBgColor: {r: 0, g: 0.43921572, b: 0.62352943, a: 1}
+  normalBgColor: {r: 0.19188322, g: 0.33002546, b: 0.5283019, a: 1}
+  hoverBgColor: {r: 0.25720897, g: 0.41361028, b: 0.6415094, a: 1}
+  pressedBgColor: {r: 0.376157, g: 0.5263827, b: 0.745283, a: 1}
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
   pressedTextColor: {r: 1, g: 1, b: 1, a: 1}

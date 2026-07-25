@@ -41,7 +41,7 @@ namespace Project.UI.Tutorial
                 return;
             
             _cts = new CancellationTokenSource();
-            HandleRequestStartedWithDelay(0.75f, _cts.Token).Forget();
+            HandleRequestStartedWithDelay(0.18f, _cts.Token).Forget();
         }
 
         private async UniTaskVoid HandleRequestStartedWithDelay(float delayTime, CancellationToken cancellationToken)

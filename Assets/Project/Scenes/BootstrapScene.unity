@@ -301,7 +301,7 @@ MonoBehaviour:
     persistentUIContainer:
       <Container>k__BackingField: {fileID: 768427798}
     loadScreenSettings:
-      useLoadScreen: 1
+      useLoadScreen: 0
       loadScreenPrefab: {fileID: 1960870892132461759, guid: feb0e1247908d7c46911e9814785a35b, type: 3}
   soundScope:
     sources:

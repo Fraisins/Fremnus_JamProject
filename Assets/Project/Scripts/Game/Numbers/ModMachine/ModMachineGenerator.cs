@@ -83,34 +83,67 @@ namespace Project.Game.Numbers
         {
             if (_robotService?.Request?.GoodValues == null)
                 return null;
+            
+            int randIndex = -1;
+            int value = 0;
+            bool found = false;
 
             List<int> result = new();
             List<HpNumber> hpNumbers = new(_hpNumbersService.Numbers);
+            HashSet<int> usedAbsValues = new();
             
             foreach (int goodVal in _robotService.Request.GoodValues)
             {
                 if (hpNumbers.Count == 0)
                     break;
-                
-                int randIndex = Random.Range(0, hpNumbers.Count);
-                HpNumber randNum = hpNumbers[randIndex];
-                
-                int minValue = Mathf.Min(goodVal, randNum.RawNumber);
-                int maxValue = Mathf.Max(goodVal, randNum.RawNumber);
-                int value = 0;
 
-                if (maxValue == minValue)
+                List<int> shuffledIndices = new(hpNumbers.Count); // shuffle for random picking
+                for (int i = 0; i < hpNumbers.Count; i++)
+                    shuffledIndices.Add(i);
+
+                for (int i = shuffledIndices.Count - 1; i > 0; i--)
                 {
-                    hpNumbers.RemoveAt(randIndex);
-                    continue;
+                    int j = Random.Range(0, i + 1);
+                    (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]);
                 }
 
-                if (Random.value < 0.5f)
-                    value = maxValue - minValue;
-                else
-                    value = 10 + minValue - maxValue;
+                foreach (int idx in shuffledIndices)
+                {
+                    HpNumber candidate = hpNumbers[idx];
+                    int minValue = Mathf.Min(goodVal, candidate.RawNumber);
+                    int maxValue = Mathf.Max(goodVal, candidate.RawNumber);
+
+                    if (maxValue == minValue) // nope, it's 0
+                        continue;
+
+                    int val1 = maxValue - minValue;
+                    int val2 = 10 + minValue - maxValue;
+                    
+                    bool pickFirst = Random.value < 0.5f;
+                    int firstPossibility = pickFirst ? val1 : val2;
+                    int secondPossibility = pickFirst ? val2 : val1;
+
+                    if (!usedAbsValues.Contains(Mathf.Abs(firstPossibility))) // check first
+                    {
+                        value = firstPossibility;
+                        randIndex = idx;
+                        found = true;
+                        break;
+                    }
+                    if (!usedAbsValues.Contains(Mathf.Abs(secondPossibility))) // check second
+                    {
+                        value = secondPossibility;
+                        randIndex = idx;
+                        found = true;
+                        break;
+                    }
+                }
                 
+                if (!found)
+                    continue;
+
                 result.Add(value);
+                usedAbsValues.Add(Mathf.Abs(value));
                 hpNumbers.RemoveAt(randIndex);
             }
             

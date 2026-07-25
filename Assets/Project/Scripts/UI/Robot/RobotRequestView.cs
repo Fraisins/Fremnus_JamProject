@@ -15,7 +15,7 @@ namespace Project.Scripts.UI
         [Header("Request appearance")] 
         [SerializeField] private Transform visibilityTransform;
         [SerializeField] private float appearanceDuration = 0.15f;
-        [SerializeField] private float tiltRotation = 15f;
+        [SerializeField] private Vector3 hideOffset = Vector3.zero;
 
         [Header("Sounds")] 
         [SerializeField] private AudioClip requestAppearSound;
@@ -25,8 +25,8 @@ namespace Project.Scripts.UI
         private ISoundService _soundService;
 
         private bool _isActive = false;
-        private Vector3 _originalScale;
-        private Sequence _requestAppearance;
+        private Vector3 _originalPos;
+        private Tween _requestAppearance;
 
         private List<RobotRequestLetter> _visibleLetters = new();
 
@@ -44,8 +44,9 @@ namespace Project.Scripts.UI
         
         private void Awake()
         {
-            _originalScale = visibilityTransform.localScale;
-            visibilityTransform.localScale = Vector3.zero;
+            _originalPos = visibilityTransform.localPosition;
+            visibilityTransform.localPosition = _originalPos + hideOffset;
+            
             SetLettersVisibility(false);
         }
 
@@ -128,25 +129,16 @@ namespace Project.Scripts.UI
             if (_requestAppearance.isAlive)
                 _requestAppearance.Stop();
 
-            visibilityTransform.localScale = Vector3.zero;
-            visibilityTransform.localRotation = Quaternion.Euler(0f, 0f, tiltRotation);
-
             if (_soundService != null && requestAppearSound != null)
                 _soundService.PlaySfx(requestAppearSound);
             
             SetLettersVisibility(true);
 
-            _requestAppearance = Sequence.Create()
-                .Group(Tween.Scale(
-                    visibilityTransform,
-                    endValue: _originalScale, 
-                    duration: appearanceDuration, 
-                    ease: Ease.OutBack))
-                .Group(Tween.LocalRotation(
-                    visibilityTransform, endValue: 
-                    Quaternion.identity, duration: 
-                    appearanceDuration, ease: 
-                    Ease.OutBack));
+            _requestAppearance = Tween.LocalPosition(
+                visibilityTransform,
+                _originalPos,
+                duration: appearanceDuration,
+                ease: Ease.OutQuad);
         }
 
         private void PlayDisappearanceAnimation()
@@ -160,21 +152,11 @@ namespace Project.Scripts.UI
             
             SetLettersVisibility(false);
 
-            _requestAppearance = Sequence.Create().Group(
-                    Tween.Scale(visibilityTransform, 
-                        endValue: Vector3.zero, 
-                        duration: appearanceDuration, 
-                        ease: Ease.InBack))
-                .Group(Tween.LocalRotation(visibilityTransform, 
-                    endValue: Quaternion.Euler(0f, 0f, tiltRotation), 
-                    duration: appearanceDuration, 
-                    ease: Ease.InBack))
-                .OnComplete(() =>
-                {
-                    // check to see if it activated again
-                    if (!_isActive)
-                        visibilityTransform.gameObject.SetActive(false);
-                });
+            _requestAppearance = Tween.LocalPosition(
+                visibilityTransform,
+                _originalPos + hideOffset,
+                duration: appearanceDuration,
+                ease: Ease.OutQuad);
         }
 
         private void SetLettersVisibility(bool visible)
