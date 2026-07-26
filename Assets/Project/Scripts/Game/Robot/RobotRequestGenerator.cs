@@ -9,6 +9,11 @@ namespace Project.Game.Robot
     {
         private readonly IHpNumbersService _hpNumbersService;
         private readonly RobotRequestSettings _settings;
+        
+        private readonly List<int> _notPresentValuesCache = new(10);
+        private readonly List<int> _presentValuesCache = new(10);
+        private readonly bool[] _presentFlagsCache = new bool[10];
+        private readonly HashSet<int> _seenValuesCache = new();
 
         public RobotRequestGenerator(RobotRequestSettings settings, 
             IHpNumbersService hpNumbersService)
@@ -19,35 +24,39 @@ namespace Project.Game.Robot
 
         public void FillRequest(RobotRequest request)
         {
+            request.Clear();
+            
             int targetAmount = Random.Range(_settings.MinAmount, _settings.MaxAmount + 1);
 
-            List<int> notPresentValues = GetNotPresentValues();
-            List<int> presentValues = GetPresentValues();
+            GetNotPresentValues(_notPresentValuesCache);
+            GetPresentValues(_presentValuesCache);
 
-            List<int> positiveNumbers = new();
-            List<int> negativeNumbers = new();
+            int positiveCount = 0;
+            int negativeCount = 0;
 
-            for (int i = 0; i < _settings.MinPositive && notPresentValues.Count > 0; i++)
+            for (int i = 0; i < _settings.MinPositive && _notPresentValuesCache.Count > 0; i++)
             {
-                int index = Random.Range(0, notPresentValues.Count);
-                positiveNumbers.Add(notPresentValues[index]);
-                notPresentValues.RemoveAt(index);
+                int index = Random.Range(0, _notPresentValuesCache.Count);
+                request.AddGoodValue(_notPresentValuesCache[index]);
+                _notPresentValuesCache.RemoveAt(index);
+                positiveCount++;
             }
     
-            for (int i = 0; i < _settings.MinNegative && presentValues.Count > 0; i++)
+            for (int i = 0; i < _settings.MinNegative && _presentValuesCache.Count > 0; i++)
             {
-                int index = Random.Range(0, presentValues.Count);
-                negativeNumbers.Add(presentValues[index]);
-                presentValues.RemoveAt(index);
+                int index = Random.Range(0, _presentValuesCache.Count);
+                request.AddBadValue(_presentValuesCache[index]);
+                _presentValuesCache.RemoveAt(index);
+                negativeCount++;
             }
             
-            int currentCount = positiveNumbers.Count + negativeNumbers.Count;
+            int currentCount = positiveCount + negativeCount;
             int remainingToFill = targetAmount - currentCount;
             
             for (int i = 0; i < remainingToFill; i++)
             {
-                bool canTakePositive = notPresentValues.Count > 0;
-                bool canTakeNegative = presentValues.Count > 0;
+                bool canTakePositive = _notPresentValuesCache.Count > 0 && positiveCount < _settings.MaxPositive;
+                bool canTakeNegative = _presentValuesCache.Count > 0 && negativeCount < _settings.MaxNegative;
 
                 if (!canTakePositive && !canTakeNegative) break;
 
@@ -57,47 +66,65 @@ namespace Project.Game.Robot
                 else
                     takePositive = canTakePositive;
 
-                if (takePositive && positiveNumbers.Count < _settings.MaxPositive)
+                if (takePositive)
                 {
-                    int index = Random.Range(0, notPresentValues.Count);
-                    positiveNumbers.Add(notPresentValues[index]);
-                    notPresentValues.RemoveAt(index);
+                    int index = Random.Range(0, _notPresentValuesCache.Count);
+                    request.AddGoodValue(_notPresentValuesCache[index]);
+                    _notPresentValuesCache.RemoveAt(index);
+                    positiveCount++;
                 }
-                else if (presentValues.Count != 0 && negativeNumbers.Count < _settings.MaxNegative)
+                else
                 {
-                    int index = Random.Range(0, presentValues.Count);
-                    negativeNumbers.Add(presentValues[index]);
-                    presentValues.RemoveAt(index);
+                    int index = Random.Range(0, _presentValuesCache.Count);
+                    request.AddBadValue(_presentValuesCache[index]);
+                    _presentValuesCache.RemoveAt(index);
+                    negativeCount++;
                 }
             }
     
-            request.SetValues(positiveNumbers, negativeNumbers);
+            request.RaiseRequestChanged();
         }
 
-        private List<int> GetPresentValues(bool ignoreNotActive = true)
+        private void GetPresentValues(List<int> resultBuffer, bool ignoreNotActive = true)
         {
-            List<int> values = new();
+            resultBuffer.Clear();
+            _seenValuesCache.Clear();
+
+            if (_hpNumbersService?.Numbers == null) return;
+
             foreach (HpNumber hpNumber in _hpNumbersService.Numbers)
             {
                 if (ignoreNotActive && hpNumber.State != HpNumberState.Active)
                     continue;
-                
-                if (values.Contains(hpNumber.CurrentValue)) // no repetitions
-                    continue;
-                
-                values.Add(hpNumber.CurrentValue);
+
+                if (_seenValuesCache.Add(hpNumber.CurrentValue))
+                {
+                    resultBuffer.Add(hpNumber.CurrentValue);
+                }
             }
-            return values;
         }
 
-        private List<int> GetNotPresentValues()
+        private void GetNotPresentValues(List<int> resultBuffer)
         {
-            List<int> freeNumbers = new() {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-            foreach (HpNumber hpNumber in _hpNumbersService.Numbers)
+            resultBuffer.Clear();
+            
+            System.Array.Clear(_presentFlagsCache, 0, _presentFlagsCache.Length);
+            if (_hpNumbersService?.Numbers != null)
             {
-                freeNumbers.Remove(hpNumber.CurrentValue);
+                foreach (HpNumber hpNumber in _hpNumbersService.Numbers)
+                {
+                    int val = hpNumber.CurrentValue;
+                    if (val >= 0 && val <= 9)
+                    {
+                        _presentFlagsCache[val] = true;
+                    }
+                }
             }
-            return freeNumbers;
+            for (int i = 0; i <= 9; i++)
+            {
+                if (!_presentFlagsCache[i])
+                    resultBuffer.Add(i);
+            }
         }
     }
 }

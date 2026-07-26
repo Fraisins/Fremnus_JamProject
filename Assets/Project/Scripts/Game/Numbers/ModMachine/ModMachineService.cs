@@ -67,7 +67,7 @@ namespace Project.Game.Numbers
                 {
                     hpNumber?.ClearModificator();
                 }
-
+            
                 mod.OnFreeState -= HandleModificatorFreed;
                 mod.ForceReset();
                 _modDictionary[mod] = null;

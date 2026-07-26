@@ -180,8 +180,16 @@ namespace Project.Scripts.UI
 
         private void OnDestroy()
         {
+            if (_robotService != null)
+            {
+                _robotService.OnRequestStarted -= HandleRequestStarted;
+                _robotService.OnRequestFinished -= HandleRequestFinished;
+            }
+            
             if (_request != null)
+            {
                 _request.OnRequestChanged -= HandleRequestChanged;
+            }
             
             Clear();
             

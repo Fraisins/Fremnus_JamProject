@@ -80,7 +80,7 @@ namespace Project.Game.Robot
             AttachRandomRobotToMovingPoint();
             
             PlaySound(movingConveyorSound);
-
+            
             await Sequence.Create()
                 .Group(Tween.Position(movingPoint, 
                     endValue: stopPoint.position, 

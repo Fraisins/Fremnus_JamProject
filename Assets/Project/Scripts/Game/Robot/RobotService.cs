@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Project.Core.Events;
@@ -92,53 +93,53 @@ namespace Project.Game.Robot
             ForceFinishCurrentTimer();
             _forceTimerCts = new CancellationTokenSource();
                 
-            using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
-                token, _forceTimerCts.Token);
-            CancellationToken combinedToken = linkedCts.Token;
-
-            try
-            {
-                _order.NextRobot();
-                _requestGenerator.FillRequest(_request);
-
-                combinedToken.ThrowIfCancellationRequested();
-                await _conveyor.AddRobotAndMoveToStop();
-                combinedToken.ThrowIfCancellationRequested();
-                
-                OnRequestStarted?.Invoke(_request);
-                await _timer.StartTimer(_settings.requestTime, _forceTimerCts.Token).SuppressCancellationThrow();
-                
-                if (token.IsCancellationRequested) // NOT TIMER!
-                    return;
-
-                RobotRequestCheckResult result = _requestChecker.CheckRequest(_request);
-                if (result.FinishedPositive)
-                {
-                    _order.SuccessCurrentRobot();
-                    
-                    _resultApplierService.Apply(result);
-                    OnRequestFinished?.Invoke(result);
-                    
-                    await _conveyor.MoveRobotToEnd();
-                }
-                else
-                {
-                    _order.FailCurrentRobot();
-                    
-                    _resultApplierService.Apply(result);
-                    OnRequestFinished?.Invoke(result);
-                    
-                    await _conveyor.ReturnRobotToStart();
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // cancelled
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+             using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                 token, _forceTimerCts.Token);
+             CancellationToken combinedToken = linkedCts.Token;
+            
+             try
+             {
+                 _order.NextRobot();
+                 _requestGenerator.FillRequest(_request);
+            
+                 combinedToken.ThrowIfCancellationRequested();
+                 await _conveyor.AddRobotAndMoveToStop();
+                 combinedToken.ThrowIfCancellationRequested();
+            
+                 OnRequestStarted?.Invoke(_request);
+                 await _timer.StartTimer(_settings.requestTime, _forceTimerCts.Token).SuppressCancellationThrow();
+            
+                  if (token.IsCancellationRequested) // NOT TIMER!
+                      return;
+            
+                 RobotRequestCheckResult result = _requestChecker.CheckRequest(_request);
+                 if (result.FinishedPositive)
+                 {
+                     _order.SuccessCurrentRobot();
+            
+                     _resultApplierService.Apply(result);
+                     OnRequestFinished?.Invoke(result);
+            
+                     await _conveyor.MoveRobotToEnd();
+                 }
+                 else
+                 {
+                     _order.FailCurrentRobot();
+            
+                     _resultApplierService.Apply(result);
+                     OnRequestFinished?.Invoke(result);
+            
+                     await _conveyor.ReturnRobotToStart();
+                 }
+             }
+             catch (OperationCanceledException)
+             {
+                 // cancelled
+             }
+             catch (Exception e)
+             {
+                 Debug.LogException(e);
+             }
         }
         
         public void StopRobotLoop()

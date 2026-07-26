@@ -19,7 +19,6 @@ namespace Project.Core.Pause
         
         public void Pause(bool showPauseMenu = true)
         {
-            Debug.Log($"[Pause Service] IsPaused: {IsPaused}, CanBePaused: {CanBePaused}, CanBeResumed: {CanBeResumed}");
             if (IsPaused || !CanBePaused) return;
             
             Debug.Log("[Pause Service] Game paused!");

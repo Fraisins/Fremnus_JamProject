@@ -46,7 +46,7 @@ namespace Project.Scripts.UI
                 fillImage.color = baseTimerColor;
                 _isLowTimeColor = false;
             }
-
+            
             float fillAmount = 1f - _timer.ElapsedTime / _timer.Time;
             fillImage.fillAmount = fillAmount;
             

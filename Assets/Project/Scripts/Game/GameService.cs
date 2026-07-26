@@ -67,6 +67,9 @@ namespace Project.Game
             _gameCts?.Cancel();
             _gameCts?.Dispose();
             _gameCts = null;
+            
+            Resources.UnloadUnusedAssets();
+            System.GC.Collect();
         }
 
         #region Level

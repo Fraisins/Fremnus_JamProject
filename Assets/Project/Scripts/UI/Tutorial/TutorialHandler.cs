@@ -35,7 +35,7 @@ namespace Project.UI.Tutorial
 
         private void HandleOnRequestStarted(RobotRequest request)
         {
-            _robotService.OnRequestStarted += HandleOnRequestStarted;
+            _robotService.OnRequestStarted -= HandleOnRequestStarted;
             
             if (_tutorialFinished)
                 return;

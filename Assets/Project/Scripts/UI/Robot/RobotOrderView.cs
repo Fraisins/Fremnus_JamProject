@@ -63,7 +63,7 @@ namespace Project.Scripts.UI
             {
                 if (_lightViews[i] == null)
                     continue;
-
+            
                 _lightViews[i].OnStateChanged -= HandleStateChanged;
                 Destroy(_lightViews[i].gameObject);
             }
